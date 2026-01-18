@@ -15,7 +15,7 @@ func RegisterTools(s *mcpserver.MCPServer, c *client.Client) {
 	tools.RegisterAutomationTools(s, h)
 	tools.RegisterDocumentTools(s, h)
 	tools.RegisterDavisTools(s, h)
-	tools.RegisterSLOTools(s, h)
+	tools.RegisterSLOToolsV2(s, h) // Refactored with optimistic locking support
 	tools.RegisterOpenPipelineTools(s, h)
 	tools.RegisterNotificationTools(s, h)
 	tools.RegisterStorageTools(s, h)

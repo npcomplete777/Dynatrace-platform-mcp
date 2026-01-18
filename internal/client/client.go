@@ -3,6 +3,8 @@ package client
 
 import (
 	"bytes"
+	"mime/multipart"
+	"net/textproto"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -175,4 +177,35 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 		StatusCode: resp.StatusCode,
 		Body:       respBody,
 	}, nil
+}
+
+
+// PostMultipart performs a POST with multipart/form-data (required for Documents API)
+func (c *Client) PostMultipart(ctx context.Context, path string, fields map[string]string) (*Response, error) {
+	var buf bytes.Buffer
+	writer := multipart.NewWriter(&buf)
+	for key, val := range fields {
+		if key == "content" {
+			part, _ := writer.CreatePart(textproto.MIMEHeader{
+				"Content-Disposition": []string{`form-data; name="content"; filename="content.json"`},
+				"Content-Type":        []string{"application/json"},
+			})
+			part.Write([]byte(val))
+		} else {
+			writer.WriteField(key, val)
+		}
+	}
+	writer.Close()
+	baseURL := c.cfg.GetAppsURL()
+	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+path, &buf)
+	req.Header.Set("Authorization", "Bearer "+c.cfg.PlatformToken)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Accept", "application/json")
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	respBody, _ := io.ReadAll(resp.Body)
+	return &Response{StatusCode: resp.StatusCode, Body: respBody}, nil
 }
