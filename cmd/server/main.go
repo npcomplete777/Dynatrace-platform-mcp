@@ -31,7 +31,7 @@ func main() {
 		mcpserver.WithToolCapabilities(true),
 	)
 
-	server.RegisterTools(s, httpClient)
+	server.RegisterTools(s, httpClient, cfg)
 
 	if err := mcpserver.ServeStdio(s); err != nil {
 		fmt.Fprintf(os.Stderr, "Server error: %v\n", err)

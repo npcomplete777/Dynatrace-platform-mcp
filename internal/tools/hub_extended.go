@@ -10,67 +10,77 @@ import (
 )
 
 // RegisterHubExtendedTools registers additional Hub/catalog tools not in the base set.
-func RegisterHubExtendedTools(s *mcpserver.MCPServer, h *Handlers) {
+func RegisterHubExtendedTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
 	// ==================== App Releases ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_hub_app_releases_list",
-		Description: `List releases for an app.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "App ID"},
+	if isEnabled("dt_hub_app_releases_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_hub_app_releases_list",
+			Description: `List releases for an app.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "App ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleHubAppReleasesList)
+		}, h.handleHubAppReleasesList)
+	}
 
 	// ==================== Extensions ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_hub_extension_get",
-		Description: `Get extension details from Hub.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Extension ID"},
+	if isEnabled("dt_hub_extension_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_hub_extension_get",
+			Description: `Get extension details from Hub.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Extension ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleHubExtensionGet)
+		}, h.handleHubExtensionGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_hub_extension_releases_list",
-		Description: `List releases for an extension.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Extension ID"},
+	if isEnabled("dt_hub_extension_releases_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_hub_extension_releases_list",
+			Description: `List releases for an extension.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Extension ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleHubExtensionReleasesList)
+		}, h.handleHubExtensionReleasesList)
+	}
 
 	// ==================== Technologies ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_hub_technology_get",
-		Description: `Get technology details from Hub.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Technology ID"},
+	if isEnabled("dt_hub_technology_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_hub_technology_get",
+			Description: `Get technology details from Hub.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Technology ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleHubTechnologyGet)
+		}, h.handleHubTechnologyGet)
+	}
 
 	// ==================== Categories ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_hub_categories_list",
-		Description: `List Hub categories.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{},
-		},
-	}, h.handleHubCategoriesList)
+	if isEnabled("dt_hub_categories_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_hub_categories_list",
+			Description: `List Hub categories.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{},
+			},
+		}, h.handleHubCategoriesList)
+	}
 }
 
 // ==================== Handler Implementations ====================

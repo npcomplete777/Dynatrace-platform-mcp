@@ -10,147 +10,167 @@ import (
 )
 
 // RegisterDavisExtendedTools registers additional Davis AI tools not in the base set.
-func RegisterDavisExtendedTools(s *mcpserver.MCPServer, h *Handlers) {
+func RegisterDavisExtendedTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
 	// ==================== Davis Analyzer Extended ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_davis_analyzer_documentation",
-		Description: `Get documentation for a Davis analyzer.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name": map[string]interface{}{"type": "string", "description": "Analyzer name"},
+	if isEnabled("dt_davis_analyzer_documentation") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_davis_analyzer_documentation",
+			Description: `Get documentation for a Davis analyzer.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name": map[string]interface{}{"type": "string", "description": "Analyzer name"},
+				},
+				Required: []string{"name"},
 			},
-			Required: []string{"name"},
-		},
-	}, h.handleDavisAnalyzerDocumentation)
+		}, h.handleDavisAnalyzerDocumentation)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_davis_analyzer_input_schema",
-		Description: `Get JSON schema for analyzer input parameters.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name": map[string]interface{}{"type": "string", "description": "Analyzer name"},
+	if isEnabled("dt_davis_analyzer_input_schema") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_davis_analyzer_input_schema",
+			Description: `Get JSON schema for analyzer input parameters.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name": map[string]interface{}{"type": "string", "description": "Analyzer name"},
+				},
+				Required: []string{"name"},
 			},
-			Required: []string{"name"},
-		},
-	}, h.handleDavisAnalyzerInputSchema)
+		}, h.handleDavisAnalyzerInputSchema)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_davis_analyzer_result_schema",
-		Description: `Get JSON schema for analyzer result.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name": map[string]interface{}{"type": "string", "description": "Analyzer name"},
+	if isEnabled("dt_davis_analyzer_result_schema") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_davis_analyzer_result_schema",
+			Description: `Get JSON schema for analyzer result.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name": map[string]interface{}{"type": "string", "description": "Analyzer name"},
+				},
+				Required: []string{"name"},
 			},
-			Required: []string{"name"},
-		},
-	}, h.handleDavisAnalyzerResultSchema)
+		}, h.handleDavisAnalyzerResultSchema)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_davis_analyzer_validate",
-		Description: `Validate input parameters for an analyzer.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name":  map[string]interface{}{"type": "string", "description": "Analyzer name"},
-				"input": map[string]interface{}{"type": "object", "description": "Input parameters to validate"},
+	if isEnabled("dt_davis_analyzer_validate") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_davis_analyzer_validate",
+			Description: `Validate input parameters for an analyzer.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name":  map[string]interface{}{"type": "string", "description": "Analyzer name"},
+					"input": map[string]interface{}{"type": "object", "description": "Input parameters to validate"},
+				},
+				Required: []string{"name", "input"},
 			},
-			Required: []string{"name", "input"},
-		},
-	}, h.handleDavisAnalyzerValidate)
+		}, h.handleDavisAnalyzerValidate)
+	}
 
 	// ==================== CoPilot Extended - NL2DQL (HIGH VALUE!) ====================
-	s.AddTool(mcp.Tool{
-		Name: "dt_copilot_nl2dql",
-		Description: `Convert natural language to DQL query using Davis CoPilot.
-
-This is a high-value tool for autonomous query generation. Given a natural language
-description, it returns a valid DQL query.
-
-Example:
-  Input: "Show me all services with error rate above 5%"
-  Output: DQL query to fetch services with high error rates`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"text":    map[string]interface{}{"type": "string", "description": "Natural language description of the query"},
-				"context": map[string]interface{}{"type": "object", "description": "Optional context (entity IDs, timeframe, etc.)"},
+	if isEnabled("dt_copilot_nl2dql") {
+		s.AddTool(mcp.Tool{
+			Name: "dt_copilot_nl2dql",
+			Description: `Convert natural language to DQL query using Davis CoPilot.
+	
+	This is a high-value tool for autonomous query generation. Given a natural language
+	description, it returns a valid DQL query.
+	
+	Example:
+	  Input: "Show me all services with error rate above 5%"
+	  Output: DQL query to fetch services with high error rates`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"text":    map[string]interface{}{"type": "string", "description": "Natural language description of the query"},
+					"context": map[string]interface{}{"type": "object", "description": "Optional context (entity IDs, timeframe, etc.)"},
+				},
+				Required: []string{"text"},
 			},
-			Required: []string{"text"},
-		},
-	}, h.handleCopilotNL2DQL)
+		}, h.handleCopilotNL2DQL)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_copilot_dql2nl",
-		Description: `Explain a DQL query in natural language using Davis CoPilot.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"query":   map[string]interface{}{"type": "string", "description": "DQL query to explain"},
-				"context": map[string]interface{}{"type": "object", "description": "Optional context"},
+	if isEnabled("dt_copilot_dql2nl") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_copilot_dql2nl",
+			Description: `Explain a DQL query in natural language using Davis CoPilot.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"query":   map[string]interface{}{"type": "string", "description": "DQL query to explain"},
+					"context": map[string]interface{}{"type": "object", "description": "Optional context"},
+				},
+				Required: []string{"query"},
 			},
-			Required: []string{"query"},
-		},
-	}, h.handleCopilotDQL2NL)
+		}, h.handleCopilotDQL2NL)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_copilot_document_search",
-		Description: `Search documents using Davis CoPilot.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"query":   map[string]interface{}{"type": "string", "description": "Search query"},
-				"context": map[string]interface{}{"type": "object", "description": "Optional context"},
+	if isEnabled("dt_copilot_document_search") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_copilot_document_search",
+			Description: `Search documents using Davis CoPilot.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"query":   map[string]interface{}{"type": "string", "description": "Search query"},
+					"context": map[string]interface{}{"type": "object", "description": "Optional context"},
+				},
+				Required: []string{"query"},
 			},
-			Required: []string{"query"},
-		},
-	}, h.handleCopilotDocumentSearch)
+		}, h.handleCopilotDocumentSearch)
+	}
 
 	// ==================== CoPilot Feedback ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_copilot_conversation_feedback",
-		Description: `Submit feedback for a CoPilot conversation.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"conversation_id": map[string]interface{}{"type": "string", "description": "Conversation ID"},
-				"rating":          map[string]interface{}{"type": "string", "description": "Rating (positive, negative)"},
-				"comment":         map[string]interface{}{"type": "string", "description": "Optional comment"},
+	if isEnabled("dt_copilot_conversation_feedback") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_copilot_conversation_feedback",
+			Description: `Submit feedback for a CoPilot conversation.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"conversation_id": map[string]interface{}{"type": "string", "description": "Conversation ID"},
+					"rating":          map[string]interface{}{"type": "string", "description": "Rating (positive, negative)"},
+					"comment":         map[string]interface{}{"type": "string", "description": "Optional comment"},
+				},
+				Required: []string{"conversation_id", "rating"},
 			},
-			Required: []string{"conversation_id", "rating"},
-		},
-	}, h.handleCopilotConversationFeedback)
+		}, h.handleCopilotConversationFeedback)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_copilot_nl2dql_feedback",
-		Description: `Submit feedback for NL2DQL generation.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"request_id":      map[string]interface{}{"type": "string", "description": "Request ID"},
-				"rating":          map[string]interface{}{"type": "string", "description": "Rating (positive, negative)"},
-				"corrected_query": map[string]interface{}{"type": "string", "description": "Corrected DQL if rating is negative"},
-				"comment":         map[string]interface{}{"type": "string", "description": "Optional comment"},
+	if isEnabled("dt_copilot_nl2dql_feedback") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_copilot_nl2dql_feedback",
+			Description: `Submit feedback for NL2DQL generation.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"request_id":      map[string]interface{}{"type": "string", "description": "Request ID"},
+					"rating":          map[string]interface{}{"type": "string", "description": "Rating (positive, negative)"},
+					"corrected_query": map[string]interface{}{"type": "string", "description": "Corrected DQL if rating is negative"},
+					"comment":         map[string]interface{}{"type": "string", "description": "Optional comment"},
+				},
+				Required: []string{"request_id", "rating"},
 			},
-			Required: []string{"request_id", "rating"},
-		},
-	}, h.handleCopilotNL2DQLFeedback)
+		}, h.handleCopilotNL2DQLFeedback)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_copilot_dql2nl_feedback",
-		Description: `Submit feedback for DQL2NL explanation.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"request_id": map[string]interface{}{"type": "string", "description": "Request ID"},
-				"rating":     map[string]interface{}{"type": "string", "description": "Rating (positive, negative)"},
-				"comment":    map[string]interface{}{"type": "string", "description": "Optional comment"},
+	if isEnabled("dt_copilot_dql2nl_feedback") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_copilot_dql2nl_feedback",
+			Description: `Submit feedback for DQL2NL explanation.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"request_id": map[string]interface{}{"type": "string", "description": "Request ID"},
+					"rating":     map[string]interface{}{"type": "string", "description": "Rating (positive, negative)"},
+					"comment":    map[string]interface{}{"type": "string", "description": "Optional comment"},
+				},
+				Required: []string{"request_id", "rating"},
 			},
-			Required: []string{"request_id", "rating"},
-		},
-	}, h.handleCopilotDQL2NLFeedback)
+		}, h.handleCopilotDQL2NLFeedback)
+	}
 }
 
 // ==================== Handler Implementations ====================

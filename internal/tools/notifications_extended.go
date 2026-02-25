@@ -10,220 +10,252 @@ import (
 )
 
 // RegisterNotificationsExtendedTools registers additional notification tools (v2 API).
-func RegisterNotificationsExtendedTools(s *mcpserver.MCPServer, h *Handlers) {
+func RegisterNotificationsExtendedTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
 	// ==================== Event Notifications ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_event_notifications_list",
-		Description: `List event notifications.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"app_id":            map[string]interface{}{"type": "string", "description": "App ID filter"},
-				"notification_type": map[string]interface{}{"type": "string", "description": "Notification type filter"},
-				"resource_id":       map[string]interface{}{"type": "string", "description": "Resource ID filter"},
-				"owner":             map[string]interface{}{"type": "string", "description": "Owner filter"},
-				"limit":             map[string]interface{}{"type": "integer", "description": "Page size"},
-				"offset":            map[string]interface{}{"type": "integer", "description": "Offset"},
+	if isEnabled("dt_event_notifications_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_event_notifications_list",
+			Description: `List event notifications.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"app_id":            map[string]interface{}{"type": "string", "description": "App ID filter"},
+					"notification_type": map[string]interface{}{"type": "string", "description": "Notification type filter"},
+					"resource_id":       map[string]interface{}{"type": "string", "description": "Resource ID filter"},
+					"owner":             map[string]interface{}{"type": "string", "description": "Owner filter"},
+					"limit":             map[string]interface{}{"type": "integer", "description": "Page size"},
+					"offset":            map[string]interface{}{"type": "integer", "description": "Offset"},
+				},
 			},
-		},
-	}, h.handleEventNotificationsList)
+		}, h.handleEventNotificationsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_event_notification_create",
-		Description: `Create an event notification.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"notification_type": map[string]interface{}{"type": "string", "description": "Notification type"},
-				"resource_id":       map[string]interface{}{"type": "string", "description": "Resource ID"},
-				"trigger_config":    map[string]interface{}{"type": "object", "description": "Trigger configuration"},
+	if isEnabled("dt_event_notification_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_event_notification_create",
+			Description: `Create an event notification.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"notification_type": map[string]interface{}{"type": "string", "description": "Notification type"},
+					"resource_id":       map[string]interface{}{"type": "string", "description": "Resource ID"},
+					"trigger_config":    map[string]interface{}{"type": "object", "description": "Trigger configuration"},
+				},
+				Required: []string{"notification_type"},
 			},
-			Required: []string{"notification_type"},
-		},
-	}, h.handleEventNotificationCreate)
+		}, h.handleEventNotificationCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_event_notification_get",
-		Description: `Get an event notification by ID.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+	if isEnabled("dt_event_notification_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_event_notification_get",
+			Description: `Get an event notification by ID.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleEventNotificationGet)
+		}, h.handleEventNotificationGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_event_notification_update",
-		Description: `Update an event notification.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":             map[string]interface{}{"type": "string", "description": "Notification ID"},
-				"trigger_config": map[string]interface{}{"type": "object", "description": "Updated trigger configuration"},
-				"enabled":        map[string]interface{}{"type": "boolean", "description": "Enable/disable notification"},
+	if isEnabled("dt_event_notification_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_event_notification_update",
+			Description: `Update an event notification.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":             map[string]interface{}{"type": "string", "description": "Notification ID"},
+					"trigger_config": map[string]interface{}{"type": "object", "description": "Updated trigger configuration"},
+					"enabled":        map[string]interface{}{"type": "boolean", "description": "Enable/disable notification"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleEventNotificationUpdate)
+		}, h.handleEventNotificationUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_event_notification_delete",
-		Description: `Delete an event notification.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+	if isEnabled("dt_event_notification_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_event_notification_delete",
+			Description: `Delete an event notification.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleEventNotificationDelete)
+		}, h.handleEventNotificationDelete)
+	}
 
 	// ==================== Resource Notifications ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_resource_notifications_list",
-		Description: `List resource notifications.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"app_id":            map[string]interface{}{"type": "string", "description": "App ID filter"},
-				"notification_type": map[string]interface{}{"type": "string", "description": "Notification type filter"},
-				"limit":             map[string]interface{}{"type": "integer", "description": "Page size"},
-				"offset":            map[string]interface{}{"type": "integer", "description": "Offset"},
+	if isEnabled("dt_resource_notifications_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_resource_notifications_list",
+			Description: `List resource notifications.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"app_id":            map[string]interface{}{"type": "string", "description": "App ID filter"},
+					"notification_type": map[string]interface{}{"type": "string", "description": "Notification type filter"},
+					"limit":             map[string]interface{}{"type": "integer", "description": "Page size"},
+					"offset":            map[string]interface{}{"type": "integer", "description": "Offset"},
+				},
 			},
-		},
-	}, h.handleResourceNotificationsList)
+		}, h.handleResourceNotificationsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_resource_notification_create",
-		Description: `Create a resource notification.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"notification_type": map[string]interface{}{"type": "string", "description": "Notification type"},
-				"resource_id":       map[string]interface{}{"type": "string", "description": "Resource ID"},
-				"trigger_config":    map[string]interface{}{"type": "object", "description": "Trigger configuration"},
+	if isEnabled("dt_resource_notification_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_resource_notification_create",
+			Description: `Create a resource notification.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"notification_type": map[string]interface{}{"type": "string", "description": "Notification type"},
+					"resource_id":       map[string]interface{}{"type": "string", "description": "Resource ID"},
+					"trigger_config":    map[string]interface{}{"type": "object", "description": "Trigger configuration"},
+				},
+				Required: []string{"notification_type", "resource_id"},
 			},
-			Required: []string{"notification_type", "resource_id"},
-		},
-	}, h.handleResourceNotificationCreate)
+		}, h.handleResourceNotificationCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_resource_notification_get_by_resource",
-		Description: `Get resource notification by notification type and resource ID.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"notification_type": map[string]interface{}{"type": "string", "description": "Notification type"},
-				"resource_id":       map[string]interface{}{"type": "string", "description": "Resource ID"},
+	if isEnabled("dt_resource_notification_get_by_resource") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_resource_notification_get_by_resource",
+			Description: `Get resource notification by notification type and resource ID.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"notification_type": map[string]interface{}{"type": "string", "description": "Notification type"},
+					"resource_id":       map[string]interface{}{"type": "string", "description": "Resource ID"},
+				},
+				Required: []string{"notification_type", "resource_id"},
 			},
-			Required: []string{"notification_type", "resource_id"},
-		},
-	}, h.handleResourceNotificationGetByResource)
+		}, h.handleResourceNotificationGetByResource)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_resource_notification_get",
-		Description: `Get a resource notification by ID.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+	if isEnabled("dt_resource_notification_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_resource_notification_get",
+			Description: `Get a resource notification by ID.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleResourceNotificationGet)
+		}, h.handleResourceNotificationGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_resource_notification_update",
-		Description: `Update a resource notification.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":             map[string]interface{}{"type": "string", "description": "Notification ID"},
-				"trigger_config": map[string]interface{}{"type": "object", "description": "Updated trigger configuration"},
-				"enabled":        map[string]interface{}{"type": "boolean", "description": "Enable/disable notification"},
+	if isEnabled("dt_resource_notification_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_resource_notification_update",
+			Description: `Update a resource notification.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":             map[string]interface{}{"type": "string", "description": "Notification ID"},
+					"trigger_config": map[string]interface{}{"type": "object", "description": "Updated trigger configuration"},
+					"enabled":        map[string]interface{}{"type": "boolean", "description": "Enable/disable notification"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleResourceNotificationUpdate)
+		}, h.handleResourceNotificationUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_resource_notification_delete",
-		Description: `Delete a resource notification.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+	if isEnabled("dt_resource_notification_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_resource_notification_delete",
+			Description: `Delete a resource notification.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleResourceNotificationDelete)
+		}, h.handleResourceNotificationDelete)
+	}
 
 	// ==================== Self Notifications (v1) ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_self_notifications_list",
-		Description: `List self notifications (v1).`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"limit":  map[string]interface{}{"type": "integer", "description": "Page size"},
-				"offset": map[string]interface{}{"type": "integer", "description": "Offset"},
+	if isEnabled("dt_self_notifications_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_self_notifications_list",
+			Description: `List self notifications (v1).`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"limit":  map[string]interface{}{"type": "integer", "description": "Page size"},
+					"offset": map[string]interface{}{"type": "integer", "description": "Offset"},
+				},
 			},
-		},
-	}, h.handleSelfNotificationsList)
+		}, h.handleSelfNotificationsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_self_notification_create",
-		Description: `Create a self notification.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"notification_type": map[string]interface{}{"type": "string", "description": "Notification type"},
-				"resource_id":       map[string]interface{}{"type": "string", "description": "Resource ID"},
-				"trigger_config":    map[string]interface{}{"type": "object", "description": "Trigger configuration"},
+	if isEnabled("dt_self_notification_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_self_notification_create",
+			Description: `Create a self notification.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"notification_type": map[string]interface{}{"type": "string", "description": "Notification type"},
+					"resource_id":       map[string]interface{}{"type": "string", "description": "Resource ID"},
+					"trigger_config":    map[string]interface{}{"type": "object", "description": "Trigger configuration"},
+				},
+				Required: []string{"notification_type"},
 			},
-			Required: []string{"notification_type"},
-		},
-	}, h.handleSelfNotificationCreate)
+		}, h.handleSelfNotificationCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_self_notification_get",
-		Description: `Get a self notification by ID.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+	if isEnabled("dt_self_notification_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_self_notification_get",
+			Description: `Get a self notification by ID.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSelfNotificationGet)
+		}, h.handleSelfNotificationGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_self_notification_update",
-		Description: `Update a self notification.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":             map[string]interface{}{"type": "string", "description": "Notification ID"},
-				"trigger_config": map[string]interface{}{"type": "object", "description": "Updated trigger configuration"},
-				"enabled":        map[string]interface{}{"type": "boolean", "description": "Enable/disable notification"},
+	if isEnabled("dt_self_notification_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_self_notification_update",
+			Description: `Update a self notification.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":             map[string]interface{}{"type": "string", "description": "Notification ID"},
+					"trigger_config": map[string]interface{}{"type": "object", "description": "Updated trigger configuration"},
+					"enabled":        map[string]interface{}{"type": "boolean", "description": "Enable/disable notification"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSelfNotificationUpdate)
+		}, h.handleSelfNotificationUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_self_notification_delete",
-		Description: `Delete a self notification.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+	if isEnabled("dt_self_notification_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_self_notification_delete",
+			Description: `Delete a self notification.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Notification ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSelfNotificationDelete)
+		}, h.handleSelfNotificationDelete)
+	}
 }
 
 // ==================== Handler Implementations ====================

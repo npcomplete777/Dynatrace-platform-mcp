@@ -10,125 +10,143 @@ import (
 )
 
 // RegisterOpenPipelineExtendedTools registers additional OpenPipeline tools.
-func RegisterOpenPipelineExtendedTools(s *mcpserver.MCPServer, h *Handlers) {
+func RegisterOpenPipelineExtendedTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
 	// ==================== Configuration Management ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_configuration_update",
-		Description: `Update an OpenPipeline configuration.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":            map[string]interface{}{"type": "string", "description": "Configuration ID"},
-				"version":       map[string]interface{}{"type": "string", "description": "Current version"},
-				"configuration": map[string]interface{}{"type": "object", "description": "Updated configuration"},
+	if isEnabled("dt_openpipeline_configuration_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_configuration_update",
+			Description: `Update an OpenPipeline configuration.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":            map[string]interface{}{"type": "string", "description": "Configuration ID"},
+					"version":       map[string]interface{}{"type": "string", "description": "Current version"},
+					"configuration": map[string]interface{}{"type": "object", "description": "Updated configuration"},
+				},
+				Required: []string{"id", "version", "configuration"},
 			},
-			Required: []string{"id", "version", "configuration"},
-		},
-	}, h.handleOpenPipelineConfigUpdate)
+		}, h.handleOpenPipelineConfigUpdate)
+	}
 
 	// ==================== DQL Processor ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_dql_autocomplete",
-		Description: `Get autocomplete suggestions for OpenPipeline DQL processor.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"query":           map[string]interface{}{"type": "string", "description": "Partial DQL query"},
-				"cursor_position": map[string]interface{}{"type": "integer", "description": "Cursor position"},
-				"context":         map[string]interface{}{"type": "object", "description": "Pipeline context"},
+	if isEnabled("dt_openpipeline_dql_autocomplete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_dql_autocomplete",
+			Description: `Get autocomplete suggestions for OpenPipeline DQL processor.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"query":           map[string]interface{}{"type": "string", "description": "Partial DQL query"},
+					"cursor_position": map[string]interface{}{"type": "integer", "description": "Cursor position"},
+					"context":         map[string]interface{}{"type": "object", "description": "Pipeline context"},
+				},
+				Required: []string{"query", "cursor_position"},
 			},
-			Required: []string{"query", "cursor_position"},
-		},
-	}, h.handleOpenPipelineDQLAutocomplete)
+		}, h.handleOpenPipelineDQLAutocomplete)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_dql_verify",
-		Description: `Verify OpenPipeline DQL processor syntax.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"query":   map[string]interface{}{"type": "string", "description": "DQL query to verify"},
-				"context": map[string]interface{}{"type": "object", "description": "Pipeline context"},
+	if isEnabled("dt_openpipeline_dql_verify") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_dql_verify",
+			Description: `Verify OpenPipeline DQL processor syntax.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"query":   map[string]interface{}{"type": "string", "description": "DQL query to verify"},
+					"context": map[string]interface{}{"type": "object", "description": "Pipeline context"},
+				},
+				Required: []string{"query"},
 			},
-			Required: []string{"query"},
-		},
-	}, h.handleOpenPipelineDQLVerify)
+		}, h.handleOpenPipelineDQLVerify)
+	}
 
 	// ==================== Matcher ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_matcher_autocomplete",
-		Description: `Get autocomplete suggestions for OpenPipeline matcher.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"query":           map[string]interface{}{"type": "string", "description": "Partial matcher query"},
-				"cursor_position": map[string]interface{}{"type": "integer", "description": "Cursor position"},
-				"context":         map[string]interface{}{"type": "object", "description": "Pipeline context"},
+	if isEnabled("dt_openpipeline_matcher_autocomplete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_matcher_autocomplete",
+			Description: `Get autocomplete suggestions for OpenPipeline matcher.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"query":           map[string]interface{}{"type": "string", "description": "Partial matcher query"},
+					"cursor_position": map[string]interface{}{"type": "integer", "description": "Cursor position"},
+					"context":         map[string]interface{}{"type": "object", "description": "Pipeline context"},
+				},
+				Required: []string{"query", "cursor_position"},
 			},
-			Required: []string{"query", "cursor_position"},
-		},
-	}, h.handleOpenPipelineMatcherAutocomplete)
+		}, h.handleOpenPipelineMatcherAutocomplete)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_matcher_verify",
-		Description: `Verify OpenPipeline matcher syntax.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"query":   map[string]interface{}{"type": "string", "description": "Matcher query to verify"},
-				"context": map[string]interface{}{"type": "object", "description": "Pipeline context"},
+	if isEnabled("dt_openpipeline_matcher_verify") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_matcher_verify",
+			Description: `Verify OpenPipeline matcher syntax.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"query":   map[string]interface{}{"type": "string", "description": "Matcher query to verify"},
+					"context": map[string]interface{}{"type": "object", "description": "Pipeline context"},
+				},
+				Required: []string{"query"},
 			},
-			Required: []string{"query"},
-		},
-	}, h.handleOpenPipelineMatcherVerify)
+		}, h.handleOpenPipelineMatcherVerify)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_lql_to_dql",
-		Description: `Convert LQL (Log Query Language) to DQL.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"lql": map[string]interface{}{"type": "string", "description": "LQL query to convert"},
+	if isEnabled("dt_openpipeline_lql_to_dql") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_lql_to_dql",
+			Description: `Convert LQL (Log Query Language) to DQL.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"lql": map[string]interface{}{"type": "string", "description": "LQL query to convert"},
+				},
+				Required: []string{"lql"},
 			},
-			Required: []string{"lql"},
-		},
-	}, h.handleOpenPipelineLQLToDQL)
+		}, h.handleOpenPipelineLQLToDQL)
+	}
 
 	// ==================== Processor Preview ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_processor_preview",
-		Description: `Preview processor output with sample data.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"processor":   map[string]interface{}{"type": "object", "description": "Processor configuration"},
-				"sample_data": map[string]interface{}{"type": "array", "description": "Sample records to process"},
+	if isEnabled("dt_openpipeline_processor_preview") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_processor_preview",
+			Description: `Preview processor output with sample data.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"processor":   map[string]interface{}{"type": "object", "description": "Processor configuration"},
+					"sample_data": map[string]interface{}{"type": "array", "description": "Sample records to process"},
+				},
+				Required: []string{"processor", "sample_data"},
 			},
-			Required: []string{"processor", "sample_data"},
-		},
-	}, h.handleOpenPipelineProcessorPreview)
+		}, h.handleOpenPipelineProcessorPreview)
+	}
 
 	// ==================== Technologies ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_technologies_list",
-		Description: `List OpenPipeline technologies.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{},
-		},
-	}, h.handleOpenPipelineTechnologiesList)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_technology_processors_list",
-		Description: `List processors available for a technology.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"technology_id": map[string]interface{}{"type": "string", "description": "Technology ID"},
+	if isEnabled("dt_openpipeline_technologies_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_technologies_list",
+			Description: `List OpenPipeline technologies.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{},
 			},
-			Required: []string{"technology_id"},
-		},
-	}, h.handleOpenPipelineTechnologyProcessorsList)
+		}, h.handleOpenPipelineTechnologiesList)
+	}
+
+	if isEnabled("dt_openpipeline_technology_processors_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_technology_processors_list",
+			Description: `List processors available for a technology.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"technology_id": map[string]interface{}{"type": "string", "description": "Technology ID"},
+				},
+				Required: []string{"technology_id"},
+			},
+		}, h.handleOpenPipelineTechnologyProcessorsList)
+	}
 }
 
 // ==================== Handler Implementations ====================

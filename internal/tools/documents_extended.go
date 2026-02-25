@@ -10,375 +10,433 @@ import (
 )
 
 // RegisterDocumentsExtendedTools registers additional document tools not in the base set.
-func RegisterDocumentsExtendedTools(s *mcpserver.MCPServer, h *Handlers) {
+func RegisterDocumentsExtendedTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
 	// ==================== Document Metadata & Content ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_metadata_get",
-		Description: `Get document metadata without content.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+	if isEnabled("dt_document_metadata_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_metadata_get",
+			Description: `Get document metadata without content.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleDocumentMetadataGet)
+		}, h.handleDocumentMetadataGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_content_get",
-		Description: `Get document content only.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+	if isEnabled("dt_document_content_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_content_get",
+			Description: `Get document content only.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleDocumentContentGet)
+		}, h.handleDocumentContentGet)
+	}
 
 	// ==================== Document Snapshots ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_snapshots_list",
-		Description: `List snapshots (versions) for a document.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+	if isEnabled("dt_document_snapshots_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_snapshots_list",
+			Description: `List snapshots (versions) for a document.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleDocumentSnapshotsList)
+		}, h.handleDocumentSnapshotsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_snapshot_get",
-		Description: `Get a specific snapshot version of a document.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":               map[string]interface{}{"type": "string", "description": "Document ID"},
-				"snapshot_version": map[string]interface{}{"type": "string", "description": "Snapshot version"},
+	if isEnabled("dt_document_snapshot_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_snapshot_get",
+			Description: `Get a specific snapshot version of a document.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":               map[string]interface{}{"type": "string", "description": "Document ID"},
+					"snapshot_version": map[string]interface{}{"type": "string", "description": "Snapshot version"},
+				},
+				Required: []string{"id", "snapshot_version"},
 			},
-			Required: []string{"id", "snapshot_version"},
-		},
-	}, h.handleDocumentSnapshotGet)
+		}, h.handleDocumentSnapshotGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_snapshot_restore",
-		Description: `Restore a document to a specific snapshot version.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":               map[string]interface{}{"type": "string", "description": "Document ID"},
-				"snapshot_version": map[string]interface{}{"type": "string", "description": "Snapshot version to restore"},
+	if isEnabled("dt_document_snapshot_restore") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_snapshot_restore",
+			Description: `Restore a document to a specific snapshot version.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":               map[string]interface{}{"type": "string", "description": "Document ID"},
+					"snapshot_version": map[string]interface{}{"type": "string", "description": "Snapshot version to restore"},
+				},
+				Required: []string{"id", "snapshot_version"},
 			},
-			Required: []string{"id", "snapshot_version"},
-		},
-	}, h.handleDocumentSnapshotRestore)
+		}, h.handleDocumentSnapshotRestore)
+	}
 
 	// ==================== Document Locking ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_lock_inspect",
-		Description: `Inspect lock status of a document.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+	if isEnabled("dt_document_lock_inspect") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_lock_inspect",
+			Description: `Inspect lock status of a document.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleDocumentLockInspect)
+		}, h.handleDocumentLockInspect)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_lock_acquire",
-		Description: `Acquire a lock on a document.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":      map[string]interface{}{"type": "string", "description": "Document ID"},
-				"version": map[string]interface{}{"type": "string", "description": "Document version"},
+	if isEnabled("dt_document_lock_acquire") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_lock_acquire",
+			Description: `Acquire a lock on a document.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":      map[string]interface{}{"type": "string", "description": "Document ID"},
+					"version": map[string]interface{}{"type": "string", "description": "Document version"},
+				},
+				Required: []string{"id", "version"},
 			},
-			Required: []string{"id", "version"},
-		},
-	}, h.handleDocumentLockAcquire)
+		}, h.handleDocumentLockAcquire)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_lock_release",
-		Description: `Release a lock on a document.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+	if isEnabled("dt_document_lock_release") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_lock_release",
+			Description: `Release a lock on a document.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleDocumentLockRelease)
+		}, h.handleDocumentLockRelease)
+	}
 
 	// ==================== Document Ownership ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_transfer_owner",
-		Description: `Transfer ownership of a document to another user.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":        map[string]interface{}{"type": "string", "description": "Document ID"},
-				"new_owner": map[string]interface{}{"type": "string", "description": "New owner user ID"},
+	if isEnabled("dt_document_transfer_owner") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_transfer_owner",
+			Description: `Transfer ownership of a document to another user.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":        map[string]interface{}{"type": "string", "description": "Document ID"},
+					"new_owner": map[string]interface{}{"type": "string", "description": "New owner user ID"},
+				},
+				Required: []string{"id", "new_owner"},
 			},
-			Required: []string{"id", "new_owner"},
-		},
-	}, h.handleDocumentTransferOwner)
+		}, h.handleDocumentTransferOwner)
+	}
 
 	// ==================== Environment Shares ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_environment_shares_list",
-		Description: `List environment-wide document shares.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
-				"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+	if isEnabled("dt_environment_shares_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_environment_shares_list",
+			Description: `List environment-wide document shares.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
+					"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+				},
 			},
-		},
-	}, h.handleEnvironmentSharesList)
+		}, h.handleEnvironmentSharesList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_environment_share_create",
-		Description: `Create an environment-wide share for a document.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"document_id": map[string]interface{}{"type": "string", "description": "Document ID to share"},
-				"access":      map[string]interface{}{"type": "string", "description": "Access level (read, write)"},
-				"claim_type":  map[string]interface{}{"type": "string", "description": "Claim type"},
+	if isEnabled("dt_environment_share_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_environment_share_create",
+			Description: `Create an environment-wide share for a document.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"document_id": map[string]interface{}{"type": "string", "description": "Document ID to share"},
+					"access":      map[string]interface{}{"type": "string", "description": "Access level (read, write)"},
+					"claim_type":  map[string]interface{}{"type": "string", "description": "Claim type"},
+				},
+				Required: []string{"document_id", "access"},
 			},
-			Required: []string{"document_id", "access"},
-		},
-	}, h.handleEnvironmentShareCreate)
+		}, h.handleEnvironmentShareCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_environment_share_get",
-		Description: `Get an environment share by ID.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+	if isEnabled("dt_environment_share_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_environment_share_get",
+			Description: `Get an environment share by ID.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleEnvironmentShareGet)
+		}, h.handleEnvironmentShareGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_environment_share_update",
-		Description: `Update an environment share.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":      map[string]interface{}{"type": "string", "description": "Share ID"},
-				"access":  map[string]interface{}{"type": "string", "description": "Access level"},
-				"enabled": map[string]interface{}{"type": "boolean", "description": "Enable/disable share"},
+	if isEnabled("dt_environment_share_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_environment_share_update",
+			Description: `Update an environment share.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":      map[string]interface{}{"type": "string", "description": "Share ID"},
+					"access":  map[string]interface{}{"type": "string", "description": "Access level"},
+					"enabled": map[string]interface{}{"type": "boolean", "description": "Enable/disable share"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleEnvironmentShareUpdate)
+		}, h.handleEnvironmentShareUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_environment_share_delete",
-		Description: `Delete an environment share.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+	if isEnabled("dt_environment_share_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_environment_share_delete",
+			Description: `Delete an environment share.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleEnvironmentShareDelete)
+		}, h.handleEnvironmentShareDelete)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_environment_share_claim",
-		Description: `Claim a shared document.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+	if isEnabled("dt_environment_share_claim") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_environment_share_claim",
+			Description: `Claim a shared document.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleEnvironmentShareClaim)
+		}, h.handleEnvironmentShareClaim)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_environment_share_claimers_list",
-		Description: `List users who have claimed a shared document.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+	if isEnabled("dt_environment_share_claimers_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_environment_share_claimers_list",
+			Description: `List users who have claimed a shared document.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleEnvironmentShareClaimersList)
+		}, h.handleEnvironmentShareClaimersList)
+	}
 
 	// ==================== Direct Shares ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_direct_shares_list",
-		Description: `List direct document shares.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
-				"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+	if isEnabled("dt_direct_shares_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_direct_shares_list",
+			Description: `List direct document shares.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
+					"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+				},
 			},
-		},
-	}, h.handleDirectSharesList)
+		}, h.handleDirectSharesList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_direct_share_create",
-		Description: `Create a direct share for a document.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"document_id": map[string]interface{}{"type": "string", "description": "Document ID to share"},
-				"recipients":  map[string]interface{}{"type": "array", "description": "List of recipient user IDs"},
-				"access":      map[string]interface{}{"type": "string", "description": "Access level (read, write)"},
+	if isEnabled("dt_direct_share_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_direct_share_create",
+			Description: `Create a direct share for a document.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"document_id": map[string]interface{}{"type": "string", "description": "Document ID to share"},
+					"recipients":  map[string]interface{}{"type": "array", "description": "List of recipient user IDs"},
+					"access":      map[string]interface{}{"type": "string", "description": "Access level (read, write)"},
+				},
+				Required: []string{"document_id", "recipients", "access"},
 			},
-			Required: []string{"document_id", "recipients", "access"},
-		},
-	}, h.handleDirectShareCreate)
+		}, h.handleDirectShareCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_direct_share_get",
-		Description: `Get a direct share by ID.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+	if isEnabled("dt_direct_share_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_direct_share_get",
+			Description: `Get a direct share by ID.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleDirectShareGet)
+		}, h.handleDirectShareGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_direct_share_update",
-		Description: `Update a direct share.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":     map[string]interface{}{"type": "string", "description": "Share ID"},
-				"access": map[string]interface{}{"type": "string", "description": "Access level"},
+	if isEnabled("dt_direct_share_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_direct_share_update",
+			Description: `Update a direct share.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":     map[string]interface{}{"type": "string", "description": "Share ID"},
+					"access": map[string]interface{}{"type": "string", "description": "Access level"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleDirectShareUpdate)
+		}, h.handleDirectShareUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_direct_share_delete",
-		Description: `Delete a direct share.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+	if isEnabled("dt_direct_share_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_direct_share_delete",
+			Description: `Delete a direct share.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleDirectShareDelete)
+		}, h.handleDirectShareDelete)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_direct_share_recipients_list",
-		Description: `List recipients of a direct share.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+	if isEnabled("dt_direct_share_recipients_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_direct_share_recipients_list",
+			Description: `List recipients of a direct share.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Share ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleDirectShareRecipientsList)
+		}, h.handleDirectShareRecipientsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_direct_share_recipients_add",
-		Description: `Add recipients to a direct share.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":         map[string]interface{}{"type": "string", "description": "Share ID"},
-				"recipients": map[string]interface{}{"type": "array", "description": "Recipients to add"},
+	if isEnabled("dt_direct_share_recipients_add") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_direct_share_recipients_add",
+			Description: `Add recipients to a direct share.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":         map[string]interface{}{"type": "string", "description": "Share ID"},
+					"recipients": map[string]interface{}{"type": "array", "description": "Recipients to add"},
+				},
+				Required: []string{"id", "recipients"},
 			},
-			Required: []string{"id", "recipients"},
-		},
-	}, h.handleDirectShareRecipientsAdd)
+		}, h.handleDirectShareRecipientsAdd)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_direct_share_recipients_remove",
-		Description: `Remove recipients from a direct share.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":         map[string]interface{}{"type": "string", "description": "Share ID"},
-				"recipients": map[string]interface{}{"type": "array", "description": "Recipients to remove"},
+	if isEnabled("dt_direct_share_recipients_remove") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_direct_share_recipients_remove",
+			Description: `Remove recipients from a direct share.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":         map[string]interface{}{"type": "string", "description": "Share ID"},
+					"recipients": map[string]interface{}{"type": "array", "description": "Recipients to remove"},
+				},
+				Required: []string{"id", "recipients"},
 			},
-			Required: []string{"id", "recipients"},
-		},
-	}, h.handleDirectShareRecipientsRemove)
+		}, h.handleDirectShareRecipientsRemove)
+	}
 
 	// ==================== Trash ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_trash_documents_list",
-		Description: `List documents in trash.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
-				"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+	if isEnabled("dt_trash_documents_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_trash_documents_list",
+			Description: `List documents in trash.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
+					"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+				},
 			},
-		},
-	}, h.handleTrashDocumentsList)
+		}, h.handleTrashDocumentsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_trash_document_get",
-		Description: `Get a document from trash.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+	if isEnabled("dt_trash_document_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_trash_document_get",
+			Description: `Get a document from trash.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleTrashDocumentGet)
+		}, h.handleTrashDocumentGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_trash_document_delete",
-		Description: `Permanently delete a document from trash.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+	if isEnabled("dt_trash_document_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_trash_document_delete",
+			Description: `Permanently delete a document from trash.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleTrashDocumentDelete)
+		}, h.handleTrashDocumentDelete)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_trash_document_restore",
-		Description: `Restore a document from trash.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+	if isEnabled("dt_trash_document_restore") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_trash_document_restore",
+			Description: `Restore a document from trash.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Document ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleTrashDocumentRestore)
+		}, h.handleTrashDocumentRestore)
+	}
 
 	// ==================== Bulk Operations ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_documents_bulk_delete",
-		Description: `Bulk delete documents.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"ids": map[string]interface{}{"type": "array", "description": "List of document IDs to delete", "items": map[string]interface{}{"type": "string"}},
+	if isEnabled("dt_documents_bulk_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_documents_bulk_delete",
+			Description: `Bulk delete documents.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"ids": map[string]interface{}{"type": "array", "description": "List of document IDs to delete", "items": map[string]interface{}{"type": "string"}},
+				},
+				Required: []string{"ids"},
 			},
-			Required: []string{"ids"},
-		},
-	}, h.handleDocumentsBulkDelete)
+		}, h.handleDocumentsBulkDelete)
+	}
 }
 
 // ==================== Handler Implementations ====================

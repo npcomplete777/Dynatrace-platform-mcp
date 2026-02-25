@@ -10,280 +10,320 @@ import (
 )
 
 // RegisterStorageExtendedTools registers additional Grail storage tools not in the base set.
-func RegisterStorageExtendedTools(s *mcpserver.MCPServer, h *Handlers) {
+func RegisterStorageExtendedTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
 	// ==================== Bucket Extended ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_bucket_update",
-		Description: `Update a storage bucket.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name":           map[string]interface{}{"type": "string", "description": "Bucket name"},
-				"version":        map[string]interface{}{"type": "integer", "description": "Current version for optimistic locking"},
-				"retention_days": map[string]interface{}{"type": "integer", "description": "New retention in days"},
-				"display_name":   map[string]interface{}{"type": "string", "description": "Display name"},
+	if isEnabled("dt_bucket_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_bucket_update",
+			Description: `Update a storage bucket.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name":           map[string]interface{}{"type": "string", "description": "Bucket name"},
+					"version":        map[string]interface{}{"type": "integer", "description": "Current version for optimistic locking"},
+					"retention_days": map[string]interface{}{"type": "integer", "description": "New retention in days"},
+					"display_name":   map[string]interface{}{"type": "string", "description": "Display name"},
+				},
+				Required: []string{"name", "version"},
 			},
-			Required: []string{"name", "version"},
-		},
-	}, h.handleBucketUpdate)
+		}, h.handleBucketUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_bucket_truncate",
-		Description: `Truncate all data in a bucket.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name": map[string]interface{}{"type": "string", "description": "Bucket name"},
+	if isEnabled("dt_bucket_truncate") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_bucket_truncate",
+			Description: `Truncate all data in a bucket.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name": map[string]interface{}{"type": "string", "description": "Bucket name"},
+				},
+				Required: []string{"name"},
 			},
-			Required: []string{"name"},
-		},
-	}, h.handleBucketTruncate)
+		}, h.handleBucketTruncate)
+	}
 
 	// ==================== Filter Segments ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_filter_segments_list",
-		Description: `List filter segments.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
-				"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+	if isEnabled("dt_filter_segments_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_filter_segments_list",
+			Description: `List filter segments.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
+					"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+				},
 			},
-		},
-	}, h.handleFilterSegmentsList)
+		}, h.handleFilterSegmentsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_filter_segment_get",
-		Description: `Get a filter segment by UID.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"uid":            map[string]interface{}{"type": "string", "description": "Filter segment UID"},
-				"add_fields":     map[string]interface{}{"type": "array", "description": "Additional fields to include"},
-				"include_filter": map[string]interface{}{"type": "boolean", "description": "Include filter details"},
+	if isEnabled("dt_filter_segment_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_filter_segment_get",
+			Description: `Get a filter segment by UID.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"uid":            map[string]interface{}{"type": "string", "description": "Filter segment UID"},
+					"add_fields":     map[string]interface{}{"type": "array", "description": "Additional fields to include"},
+					"include_filter": map[string]interface{}{"type": "boolean", "description": "Include filter details"},
+				},
+				Required: []string{"uid"},
 			},
-			Required: []string{"uid"},
-		},
-	}, h.handleFilterSegmentGet)
+		}, h.handleFilterSegmentGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_filter_segment_create",
-		Description: `Create a new filter segment.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name":        map[string]interface{}{"type": "string", "description": "Segment name"},
-				"description": map[string]interface{}{"type": "string", "description": "Description"},
-				"is_public":   map[string]interface{}{"type": "boolean", "description": "Public visibility"},
-				"variables":   map[string]interface{}{"type": "object", "description": "Variable definitions"},
-				"includes":    map[string]interface{}{"type": "array", "description": "Include conditions"},
-				"excludes":    map[string]interface{}{"type": "array", "description": "Exclude conditions"},
+	if isEnabled("dt_filter_segment_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_filter_segment_create",
+			Description: `Create a new filter segment.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name":        map[string]interface{}{"type": "string", "description": "Segment name"},
+					"description": map[string]interface{}{"type": "string", "description": "Description"},
+					"is_public":   map[string]interface{}{"type": "boolean", "description": "Public visibility"},
+					"variables":   map[string]interface{}{"type": "object", "description": "Variable definitions"},
+					"includes":    map[string]interface{}{"type": "array", "description": "Include conditions"},
+					"excludes":    map[string]interface{}{"type": "array", "description": "Exclude conditions"},
+				},
+				Required: []string{"name"},
 			},
-			Required: []string{"name"},
-		},
-	}, h.handleFilterSegmentCreate)
+		}, h.handleFilterSegmentCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_filter_segment_update",
-		Description: `Update a filter segment.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"uid":         map[string]interface{}{"type": "string", "description": "Filter segment UID"},
-				"version":     map[string]interface{}{"type": "string", "description": "Current version"},
-				"name":        map[string]interface{}{"type": "string", "description": "New name"},
-				"description": map[string]interface{}{"type": "string", "description": "New description"},
-				"is_public":   map[string]interface{}{"type": "boolean", "description": "Public visibility"},
-				"variables":   map[string]interface{}{"type": "object", "description": "Variable definitions"},
-				"includes":    map[string]interface{}{"type": "array", "description": "Include conditions"},
-				"excludes":    map[string]interface{}{"type": "array", "description": "Exclude conditions"},
+	if isEnabled("dt_filter_segment_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_filter_segment_update",
+			Description: `Update a filter segment.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"uid":         map[string]interface{}{"type": "string", "description": "Filter segment UID"},
+					"version":     map[string]interface{}{"type": "string", "description": "Current version"},
+					"name":        map[string]interface{}{"type": "string", "description": "New name"},
+					"description": map[string]interface{}{"type": "string", "description": "New description"},
+					"is_public":   map[string]interface{}{"type": "boolean", "description": "Public visibility"},
+					"variables":   map[string]interface{}{"type": "object", "description": "Variable definitions"},
+					"includes":    map[string]interface{}{"type": "array", "description": "Include conditions"},
+					"excludes":    map[string]interface{}{"type": "array", "description": "Exclude conditions"},
+				},
+				Required: []string{"uid", "version"},
 			},
-			Required: []string{"uid", "version"},
-		},
-	}, h.handleFilterSegmentUpdate)
+		}, h.handleFilterSegmentUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_filter_segment_delete",
-		Description: `Delete a filter segment.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"uid":     map[string]interface{}{"type": "string", "description": "Filter segment UID"},
-				"version": map[string]interface{}{"type": "string", "description": "Current version"},
+	if isEnabled("dt_filter_segment_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_filter_segment_delete",
+			Description: `Delete a filter segment.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"uid":     map[string]interface{}{"type": "string", "description": "Filter segment UID"},
+					"version": map[string]interface{}{"type": "string", "description": "Current version"},
+				},
+				Required: []string{"uid", "version"},
 			},
-			Required: []string{"uid", "version"},
-		},
-	}, h.handleFilterSegmentDelete)
+		}, h.handleFilterSegmentDelete)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_filter_segments_entity_model",
-		Description: `Get filter segments entity model (available fields and attributes).`,
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{},
-		},
-	}, h.handleFilterSegmentsEntityModel)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_filter_segments_lean",
-		Description: `Get filter segments in lean format (minimal data).`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"uids": map[string]interface{}{"type": "array", "description": "List of UIDs to fetch", "items": map[string]interface{}{"type": "string"}},
+	if isEnabled("dt_filter_segments_entity_model") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_filter_segments_entity_model",
+			Description: `Get filter segments entity model (available fields and attributes).`,
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{},
 			},
-		},
-	}, h.handleFilterSegmentsLean)
+		}, h.handleFilterSegmentsEntityModel)
+	}
+
+	if isEnabled("dt_filter_segments_lean") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_filter_segments_lean",
+			Description: `Get filter segments in lean format (minimal data).`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"uids": map[string]interface{}{"type": "array", "description": "List of UIDs to fetch", "items": map[string]interface{}{"type": "string"}},
+				},
+			},
+		}, h.handleFilterSegmentsLean)
+	}
 
 	// ==================== Fieldsets ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_fieldsets_list",
-		Description: `List custom field definitions.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"table":     map[string]interface{}{"type": "string", "description": "Table name"},
-				"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+	if isEnabled("dt_fieldsets_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_fieldsets_list",
+			Description: `List custom field definitions.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"table":     map[string]interface{}{"type": "string", "description": "Table name"},
+					"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+				},
 			},
-		},
-	}, h.handleFieldsetsList)
+		}, h.handleFieldsetsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_fieldset_get",
-		Description: `Get a fieldset by UID.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"uid": map[string]interface{}{"type": "string", "description": "Fieldset UID"},
+	if isEnabled("dt_fieldset_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_fieldset_get",
+			Description: `Get a fieldset by UID.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"uid": map[string]interface{}{"type": "string", "description": "Fieldset UID"},
+				},
+				Required: []string{"uid"},
 			},
-			Required: []string{"uid"},
-		},
-	}, h.handleFieldsetGet)
+		}, h.handleFieldsetGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_fieldset_create",
-		Description: `Create a new fieldset.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name":        map[string]interface{}{"type": "string", "description": "Fieldset name"},
-				"table":       map[string]interface{}{"type": "string", "description": "Target table"},
-				"description": map[string]interface{}{"type": "string", "description": "Description"},
-				"fields":      map[string]interface{}{"type": "array", "description": "Field definitions"},
+	if isEnabled("dt_fieldset_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_fieldset_create",
+			Description: `Create a new fieldset.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name":        map[string]interface{}{"type": "string", "description": "Fieldset name"},
+					"table":       map[string]interface{}{"type": "string", "description": "Target table"},
+					"description": map[string]interface{}{"type": "string", "description": "Description"},
+					"fields":      map[string]interface{}{"type": "array", "description": "Field definitions"},
+				},
+				Required: []string{"name", "table", "fields"},
 			},
-			Required: []string{"name", "table", "fields"},
-		},
-	}, h.handleFieldsetCreate)
+		}, h.handleFieldsetCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_fieldset_update",
-		Description: `Update a fieldset.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"uid":         map[string]interface{}{"type": "string", "description": "Fieldset UID"},
-				"version":     map[string]interface{}{"type": "string", "description": "Current version"},
-				"name":        map[string]interface{}{"type": "string", "description": "New name"},
-				"description": map[string]interface{}{"type": "string", "description": "New description"},
-				"fields":      map[string]interface{}{"type": "array", "description": "Updated field definitions"},
+	if isEnabled("dt_fieldset_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_fieldset_update",
+			Description: `Update a fieldset.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"uid":         map[string]interface{}{"type": "string", "description": "Fieldset UID"},
+					"version":     map[string]interface{}{"type": "string", "description": "Current version"},
+					"name":        map[string]interface{}{"type": "string", "description": "New name"},
+					"description": map[string]interface{}{"type": "string", "description": "New description"},
+					"fields":      map[string]interface{}{"type": "array", "description": "Updated field definitions"},
+				},
+				Required: []string{"uid", "version"},
 			},
-			Required: []string{"uid", "version"},
-		},
-	}, h.handleFieldsetUpdate)
+		}, h.handleFieldsetUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_fieldset_delete",
-		Description: `Delete a fieldset.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"uid":     map[string]interface{}{"type": "string", "description": "Fieldset UID"},
-				"version": map[string]interface{}{"type": "string", "description": "Current version"},
+	if isEnabled("dt_fieldset_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_fieldset_delete",
+			Description: `Delete a fieldset.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"uid":     map[string]interface{}{"type": "string", "description": "Fieldset UID"},
+					"version": map[string]interface{}{"type": "string", "description": "Current version"},
+				},
+				Required: []string{"uid", "version"},
 			},
-			Required: []string{"uid", "version"},
-		},
-	}, h.handleFieldsetDelete)
+		}, h.handleFieldsetDelete)
+	}
 
 	// ==================== Record Deletion (GDPR) ====================
-	s.AddTool(mcp.Tool{
-		Name: "dt_record_deletion_execute",
-		Description: `Execute a record deletion request (GDPR compliance).
-
-Deletes records matching the specified criteria from Grail storage.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"table":  map[string]interface{}{"type": "string", "description": "Table name"},
-				"filter": map[string]interface{}{"type": "string", "description": "DQL filter for records to delete"},
+	if isEnabled("dt_record_deletion_execute") {
+		s.AddTool(mcp.Tool{
+			Name: "dt_record_deletion_execute",
+			Description: `Execute a record deletion request (GDPR compliance).
+	
+	Deletes records matching the specified criteria from Grail storage.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"table":  map[string]interface{}{"type": "string", "description": "Table name"},
+					"filter": map[string]interface{}{"type": "string", "description": "DQL filter for records to delete"},
+				},
+				Required: []string{"table", "filter"},
 			},
-			Required: []string{"table", "filter"},
-		},
-	}, h.handleRecordDeletionExecute)
+		}, h.handleRecordDeletionExecute)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_record_deletion_status",
-		Description: `Get status of a record deletion request.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"request_token": map[string]interface{}{"type": "string", "description": "Request token from execute"},
+	if isEnabled("dt_record_deletion_status") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_record_deletion_status",
+			Description: `Get status of a record deletion request.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"request_token": map[string]interface{}{"type": "string", "description": "Request token from execute"},
+				},
+				Required: []string{"request_token"},
 			},
-			Required: []string{"request_token"},
-		},
-	}, h.handleRecordDeletionStatus)
+		}, h.handleRecordDeletionStatus)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_record_deletion_cancel",
-		Description: `Cancel a record deletion request.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"request_token": map[string]interface{}{"type": "string", "description": "Request token from execute"},
+	if isEnabled("dt_record_deletion_cancel") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_record_deletion_cancel",
+			Description: `Cancel a record deletion request.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"request_token": map[string]interface{}{"type": "string", "description": "Request token from execute"},
+				},
+				Required: []string{"request_token"},
 			},
-			Required: []string{"request_token"},
-		},
-	}, h.handleRecordDeletionCancel)
+		}, h.handleRecordDeletionCancel)
+	}
 
 	// ==================== Resource Store (Lookup Tables) ====================
-	s.AddTool(mcp.Tool{
-		Name: "dt_lookup_table_upload",
-		Description: `Upload a lookup table for data enrichment.
-
-Lookup tables can be used in DQL queries for data enrichment.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name":    map[string]interface{}{"type": "string", "description": "Lookup table name"},
-				"content": map[string]interface{}{"type": "string", "description": "CSV content"},
+	if isEnabled("dt_lookup_table_upload") {
+		s.AddTool(mcp.Tool{
+			Name: "dt_lookup_table_upload",
+			Description: `Upload a lookup table for data enrichment.
+	
+	Lookup tables can be used in DQL queries for data enrichment.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name":    map[string]interface{}{"type": "string", "description": "Lookup table name"},
+					"content": map[string]interface{}{"type": "string", "description": "CSV content"},
+				},
+				Required: []string{"name", "content"},
 			},
-			Required: []string{"name", "content"},
-		},
-	}, h.handleLookupTableUpload)
+		}, h.handleLookupTableUpload)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_lookup_table_test_pattern",
-		Description: `Test a lookup table pattern/query.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name":    map[string]interface{}{"type": "string", "description": "Lookup table name"},
-				"pattern": map[string]interface{}{"type": "string", "description": "Pattern to test"},
+	if isEnabled("dt_lookup_table_test_pattern") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_lookup_table_test_pattern",
+			Description: `Test a lookup table pattern/query.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name":    map[string]interface{}{"type": "string", "description": "Lookup table name"},
+					"pattern": map[string]interface{}{"type": "string", "description": "Pattern to test"},
+				},
+				Required: []string{"name", "pattern"},
 			},
-			Required: []string{"name", "pattern"},
-		},
-	}, h.handleLookupTableTestPattern)
+		}, h.handleLookupTableTestPattern)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_resource_files_delete",
-		Description: `Delete resource files.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"files": map[string]interface{}{"type": "array", "description": "List of file paths to delete", "items": map[string]interface{}{"type": "string"}},
+	if isEnabled("dt_resource_files_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_resource_files_delete",
+			Description: `Delete resource files.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"files": map[string]interface{}{"type": "array", "description": "List of file paths to delete", "items": map[string]interface{}{"type": "string"}},
+				},
+				Required: []string{"files"},
 			},
-			Required: []string{"files"},
-		},
-	}, h.handleResourceFilesDelete)
+		}, h.handleResourceFilesDelete)
+	}
 }
 
 // ==================== Handler Implementations ====================

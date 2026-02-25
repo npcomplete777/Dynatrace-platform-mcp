@@ -61,298 +61,320 @@ type SLOPollResponse struct {
 }
 
 // RegisterSLOTools registers all SLO-related MCP tools with optimistic locking support.
-func RegisterSLOToolsV2(s *mcpserver.MCPServer, h *Handlers) {
+func RegisterSLOToolsV2(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
 	// List SLOs
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slos_list",
-		Description: "List Service Level Objectives (SLOs) with pagination support. Returns SLO definitions including their IDs and versions for subsequent operations.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"page_size": map[string]interface{}{
-					"type":        "integer",
-					"description": "Number of SLOs per page (max 100, default 100)",
-				},
-			},
-		},
-	}, h.handleSLOsListV2)
-
-	// Get SLO
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_get",
-		Description: "Get details of a specific SLO by ID. Returns the full SLO definition including the current version hash required for updates/deletes.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{
-					"type":        "string",
-					"description": "SLO ID",
-				},
-			},
-			Required: []string{"id"},
-		},
-	}, h.handleSLOGetV2)
-
-	// Create SLO
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_create",
-		Description: "Create a new SLO. Use either customSli (for DQL-based indicators) OR sliReference (for built-in templates) - not both. Returns the created SLO with its ID and version hash.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name": map[string]interface{}{
-					"type":        "string",
-					"description": "SLO name (required)",
-				},
-				"description": map[string]interface{}{
-					"type":        "string",
-					"description": "SLO description",
-				},
-				"customSli": map[string]interface{}{
-					"type":        "object",
-					"description": "Custom SLI using DQL query. Mutually exclusive with sliReference.",
-					"properties": map[string]interface{}{
-						"indicator": map[string]interface{}{
-							"type":        "string",
-							"description": "DQL query that outputs a 'sli' field with value 0-100. Example: 'timeseries sli=avg(dt.host.cpu.idle)'",
-						},
+	if isEnabled("dt_slos_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slos_list",
+			Description: "List Service Level Objectives (SLOs) with pagination support. Returns SLO definitions including their IDs and versions for subsequent operations.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"page_size": map[string]interface{}{
+						"type":        "integer",
+						"description": "Number of SLOs per page (max 100, default 100)",
 					},
 				},
-				"sliReference": map[string]interface{}{
-					"type":        "object",
-					"description": "SLI template reference. Mutually exclusive with customSli.",
-					"properties": map[string]interface{}{
-						"templateId": map[string]interface{}{
-							"type":        "string",
-							"description": "SLI template ID from dt_slo_templates_list",
+			},
+		}, h.handleSLOsListV2)
+	}
+
+	// Get SLO
+	if isEnabled("dt_slo_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slo_get",
+			Description: "Get details of a specific SLO by ID. Returns the full SLO definition including the current version hash required for updates/deletes.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{
+						"type":        "string",
+						"description": "SLO ID",
+					},
+				},
+				Required: []string{"id"},
+			},
+		}, h.handleSLOGetV2)
+	}
+
+	// Create SLO
+	if isEnabled("dt_slo_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slo_create",
+			Description: "Create a new SLO. Use either customSli (for DQL-based indicators) OR sliReference (for built-in templates) - not both. Returns the created SLO with its ID and version hash.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name": map[string]interface{}{
+						"type":        "string",
+						"description": "SLO name (required)",
+					},
+					"description": map[string]interface{}{
+						"type":        "string",
+						"description": "SLO description",
+					},
+					"customSli": map[string]interface{}{
+						"type":        "object",
+						"description": "Custom SLI using DQL query. Mutually exclusive with sliReference.",
+						"properties": map[string]interface{}{
+							"indicator": map[string]interface{}{
+								"type":        "string",
+								"description": "DQL query that outputs a 'sli' field with value 0-100. Example: 'timeseries sli=avg(dt.host.cpu.idle)'",
+							},
 						},
-						"variables": map[string]interface{}{
-							"type":        "array",
-							"description": "Template variables (name/value pairs)",
-							"items": map[string]interface{}{
-								"type": "object",
-								"properties": map[string]interface{}{
-									"name":  map[string]interface{}{"type": "string"},
-									"value": map[string]interface{}{"type": "string"},
+					},
+					"sliReference": map[string]interface{}{
+						"type":        "object",
+						"description": "SLI template reference. Mutually exclusive with customSli.",
+						"properties": map[string]interface{}{
+							"templateId": map[string]interface{}{
+								"type":        "string",
+								"description": "SLI template ID from dt_slo_templates_list",
+							},
+							"variables": map[string]interface{}{
+								"type":        "array",
+								"description": "Template variables (name/value pairs)",
+								"items": map[string]interface{}{
+									"type": "object",
+									"properties": map[string]interface{}{
+										"name":  map[string]interface{}{"type": "string"},
+										"value": map[string]interface{}{"type": "string"},
+									},
 								},
 							},
 						},
 					},
-				},
-				"criteria": map[string]interface{}{
-					"type":        "array",
-					"description": "SLO criteria (required)",
-					"items": map[string]interface{}{
-						"type": "object",
-						"properties": map[string]interface{}{
-							"timeframeFrom": map[string]interface{}{
-								"type":        "string",
-								"description": "Start of timeframe (e.g., 'now-7d')",
-							},
-							"timeframeTo": map[string]interface{}{
-								"type":        "string",
-								"description": "End of timeframe (e.g., 'now')",
-							},
-							"target": map[string]interface{}{
-								"type":        "number",
-								"description": "Target percentage (0-100)",
-							},
-							"warning": map[string]interface{}{
-								"type":        "number",
-								"description": "Warning threshold percentage (0-100)",
+					"criteria": map[string]interface{}{
+						"type":        "array",
+						"description": "SLO criteria (required)",
+						"items": map[string]interface{}{
+							"type": "object",
+							"properties": map[string]interface{}{
+								"timeframeFrom": map[string]interface{}{
+									"type":        "string",
+									"description": "Start of timeframe (e.g., 'now-7d')",
+								},
+								"timeframeTo": map[string]interface{}{
+									"type":        "string",
+									"description": "End of timeframe (e.g., 'now')",
+								},
+								"target": map[string]interface{}{
+									"type":        "number",
+									"description": "Target percentage (0-100)",
+								},
+								"warning": map[string]interface{}{
+									"type":        "number",
+									"description": "Warning threshold percentage (0-100)",
+								},
 							},
 						},
 					},
+					"tags": map[string]interface{}{
+						"type":        "array",
+						"description": "Tags for the SLO (e.g., 'Stage:DEV')",
+						"items":       map[string]interface{}{"type": "string"},
+					},
 				},
-				"tags": map[string]interface{}{
-					"type":        "array",
-					"description": "Tags for the SLO (e.g., 'Stage:DEV')",
-					"items":       map[string]interface{}{"type": "string"},
-				},
+				Required: []string{"name", "criteria"},
 			},
-			Required: []string{"name", "criteria"},
-		},
-	}, h.handleSLOCreateV2)
+		}, h.handleSLOCreateV2)
+	}
 
 	// Update SLO - atomic fetch-mutate pattern
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_update",
-		Description: "Update an existing SLO. This tool implements atomic fetch-mutate: it fetches the current version, applies changes, and handles 409 conflicts automatically with retry.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{
-					"type":        "string",
-					"description": "SLO ID (required)",
-				},
-				"name": map[string]interface{}{
-					"type":        "string",
-					"description": "Updated SLO name",
-				},
-				"description": map[string]interface{}{
-					"type":        "string",
-					"description": "Updated SLO description",
-				},
-				"customSli": map[string]interface{}{
-					"type":        "object",
-					"description": "Updated custom SLI (mutually exclusive with sliReference)",
-					"properties": map[string]interface{}{
-						"indicator": map[string]interface{}{
-							"type":        "string",
-							"description": "DQL query that outputs a 'sli' field with value 0-100",
+	if isEnabled("dt_slo_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slo_update",
+			Description: "Update an existing SLO. This tool implements atomic fetch-mutate: it fetches the current version, applies changes, and handles 409 conflicts automatically with retry.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{
+						"type":        "string",
+						"description": "SLO ID (required)",
+					},
+					"name": map[string]interface{}{
+						"type":        "string",
+						"description": "Updated SLO name",
+					},
+					"description": map[string]interface{}{
+						"type":        "string",
+						"description": "Updated SLO description",
+					},
+					"customSli": map[string]interface{}{
+						"type":        "object",
+						"description": "Updated custom SLI (mutually exclusive with sliReference)",
+						"properties": map[string]interface{}{
+							"indicator": map[string]interface{}{
+								"type":        "string",
+								"description": "DQL query that outputs a 'sli' field with value 0-100",
+							},
 						},
 					},
+					"sliReference": map[string]interface{}{
+						"type":        "object",
+						"description": "Updated SLI template reference (mutually exclusive with customSli)",
+					},
+					"criteria": map[string]interface{}{
+						"type":        "array",
+						"description": "Updated SLO criteria",
+					},
+					"tags": map[string]interface{}{
+						"type":        "array",
+						"description": "Updated tags",
+						"items":       map[string]interface{}{"type": "string"},
+					},
 				},
-				"sliReference": map[string]interface{}{
-					"type":        "object",
-					"description": "Updated SLI template reference (mutually exclusive with customSli)",
-				},
-				"criteria": map[string]interface{}{
-					"type":        "array",
-					"description": "Updated SLO criteria",
-				},
-				"tags": map[string]interface{}{
-					"type":        "array",
-					"description": "Updated tags",
-					"items":       map[string]interface{}{"type": "string"},
-				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSLOUpdateV2)
+		}, h.handleSLOUpdateV2)
+	}
 
 	// Delete SLO
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_delete",
-		Description: "Delete an SLO by ID. This tool fetches the current version before deletion to satisfy optimistic locking requirements.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{
-					"type":        "string",
-					"description": "SLO ID (required)",
+	if isEnabled("dt_slo_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slo_delete",
+			Description: "Delete an SLO by ID. This tool fetches the current version before deletion to satisfy optimistic locking requirements.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{
+						"type":        "string",
+						"description": "SLO ID (required)",
+					},
 				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSLODeleteV2)
+		}, h.handleSLODeleteV2)
+	}
 
 	// List SLO Templates
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_templates_list",
-		Description: "List built-in SLO objective templates. Templates provide pre-defined DQL indicators for common use cases like Service Availability, Service Performance, Host CPU, and Kubernetes Efficiency. Use template IDs with dt_slo_create's sliReference parameter instead of writing custom DQL.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"page_size": map[string]interface{}{
-					"type":        "integer",
-					"description": "Number of templates per page (max 400)",
+	if isEnabled("dt_slo_templates_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slo_templates_list",
+			Description: "List built-in SLO objective templates. Templates provide pre-defined DQL indicators for common use cases like Service Availability, Service Performance, Host CPU, and Kubernetes Efficiency. Use template IDs with dt_slo_create's sliReference parameter instead of writing custom DQL.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"page_size": map[string]interface{}{
+						"type":        "integer",
+						"description": "Number of templates per page (max 400)",
+					},
 				},
 			},
-		},
-	}, h.handleSLOTemplatesListV2)
+		}, h.handleSLOTemplatesListV2)
+	}
 
 	// Get SLO Template
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_template_get",
-		Description: "Get details of a specific SLO objective template by ID, including required variables. Use this to discover what variables (e.g., services, responseTimeInMilliSeconds) are needed before creating an SLO with sliReference.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{
-					"type":        "string",
-					"description": "Template ID (Base64 encoded, from dt_slo_templates_list)",
+	if isEnabled("dt_slo_template_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slo_template_get",
+			Description: "Get details of a specific SLO objective template by ID, including required variables. Use this to discover what variables (e.g., services, responseTimeInMilliSeconds) are needed before creating an SLO with sliReference.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{
+						"type":        "string",
+						"description": "Template ID (Base64 encoded, from dt_slo_templates_list)",
+					},
 				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSLOTemplateGetV2)
+		}, h.handleSLOTemplateGetV2)
+	}
 
 	// ==================== SLO Evaluation Tools ====================
 
 	// Evaluate SLO (high-level, handles async automatically)
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_evaluate",
-		Description: "Evaluate an SLO and get its current status. This tool handles the async evaluation pattern automatically: it starts the evaluation, polls for completion if needed, and returns the final result. Use this for a simple one-call evaluation.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{
-					"type":        "string",
-					"description": "SLO ID to evaluate (required)",
+	if isEnabled("dt_slo_evaluate") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slo_evaluate",
+			Description: "Evaluate an SLO and get its current status. This tool handles the async evaluation pattern automatically: it starts the evaluation, polls for completion if needed, and returns the final result. Use this for a simple one-call evaluation.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{
+						"type":        "string",
+						"description": "SLO ID to evaluate (required)",
+					},
+					"timeframe_from": map[string]interface{}{
+						"type":        "string",
+						"description": "Start of custom timeframe (e.g., 'now-30d'). If not provided, uses SLO's default criteria timeframe.",
+					},
+					"timeframe_to": map[string]interface{}{
+						"type":        "string",
+						"description": "End of custom timeframe (e.g., 'now'). If not provided, uses SLO's default criteria timeframe.",
+					},
 				},
-				"timeframe_from": map[string]interface{}{
-					"type":        "string",
-					"description": "Start of custom timeframe (e.g., 'now-30d'). If not provided, uses SLO's default criteria timeframe.",
-				},
-				"timeframe_to": map[string]interface{}{
-					"type":        "string",
-					"description": "End of custom timeframe (e.g., 'now'). If not provided, uses SLO's default criteria timeframe.",
-				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSLOEvaluate)
+		}, h.handleSLOEvaluate)
+	}
 
 	// Start Evaluation (low-level)
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_evaluation_start",
-		Description: "Start an SLO evaluation. May return results immediately (sync) or an evaluation token for polling (async). For most use cases, prefer dt_slo_evaluate which handles both scenarios automatically.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{
-					"type":        "string",
-					"description": "SLO ID to evaluate (required)",
+	if isEnabled("dt_slo_evaluation_start") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slo_evaluation_start",
+			Description: "Start an SLO evaluation. May return results immediately (sync) or an evaluation token for polling (async). For most use cases, prefer dt_slo_evaluate which handles both scenarios automatically.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{
+						"type":        "string",
+						"description": "SLO ID to evaluate (required)",
+					},
+					"timeframe_from": map[string]interface{}{
+						"type":        "string",
+						"description": "Start of custom timeframe (e.g., 'now-30d')",
+					},
+					"timeframe_to": map[string]interface{}{
+						"type":        "string",
+						"description": "End of custom timeframe (e.g., 'now')",
+					},
+					"timeout_ms": map[string]interface{}{
+						"type":        "integer",
+						"description": "Request timeout in milliseconds. Lower values increase chance of async response. Default: 1000",
+					},
 				},
-				"timeframe_from": map[string]interface{}{
-					"type":        "string",
-					"description": "Start of custom timeframe (e.g., 'now-30d')",
-				},
-				"timeframe_to": map[string]interface{}{
-					"type":        "string",
-					"description": "End of custom timeframe (e.g., 'now')",
-				},
-				"timeout_ms": map[string]interface{}{
-					"type":        "integer",
-					"description": "Request timeout in milliseconds. Lower values increase chance of async response. Default: 1000",
-				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSLOEvaluationStart)
+		}, h.handleSLOEvaluationStart)
+	}
 
 	// Poll Evaluation (low-level)
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_evaluation_poll",
-		Description: "Poll the status of an async SLO evaluation. Returns IN_PROGRESS with progress percentage, or COMPLETED with results.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"evaluation_token": map[string]interface{}{
-					"type":        "string",
-					"description": "Evaluation token from dt_slo_evaluation_start (required)",
+	if isEnabled("dt_slo_evaluation_poll") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slo_evaluation_poll",
+			Description: "Poll the status of an async SLO evaluation. Returns IN_PROGRESS with progress percentage, or COMPLETED with results.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"evaluation_token": map[string]interface{}{
+						"type":        "string",
+						"description": "Evaluation token from dt_slo_evaluation_start (required)",
+					},
 				},
+				Required: []string{"evaluation_token"},
 			},
-			Required: []string{"evaluation_token"},
-		},
-	}, h.handleSLOEvaluationPoll)
+		}, h.handleSLOEvaluationPoll)
+	}
 
 	// Cancel Evaluation (low-level)
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_evaluation_cancel",
-		Description: "Cancel a running SLO evaluation. Use this to abort long-running evaluations.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"evaluation_token": map[string]interface{}{
-					"type":        "string",
-					"description": "Evaluation token from dt_slo_evaluation_start (required)",
+	if isEnabled("dt_slo_evaluation_cancel") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_slo_evaluation_cancel",
+			Description: "Cancel a running SLO evaluation. Use this to abort long-running evaluations.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"evaluation_token": map[string]interface{}{
+						"type":        "string",
+						"description": "Evaluation token from dt_slo_evaluation_start (required)",
+					},
 				},
+				Required: []string{"evaluation_token"},
 			},
-			Required: []string{"evaluation_token"},
-		},
-	}, h.handleSLOEvaluationCancel)
+		}, h.handleSLOEvaluationCancel)
+	}
 }
 
 // fetchSLO retrieves an SLO and returns the parsed response

@@ -1,0 +1,151 @@
+# Dynatrace Platform MCP Server - Tool Configuration
+#
+# All tools are enabled by default. To disable a specific tool, add an entry
+# with enabled: false. The config file path can be overridden with the
+# DYNATRACE_CONFIG_FILE environment variable.
+#
+# Example - disable destructive or rarely-used tools:
+#
+# tools:
+#   dt_workflow_delete:
+#     enabled: false
+#   dt_document_delete:
+#     enabled: false
+#   dt_slo_delete:
+#     enabled: false
+#   dt_bucket_truncate:
+#     enabled: false
+#   dt_record_deletion_execute:
+#     enabled: false
+#   dt_trash_document_delete:
+#     enabled: false
+#   dt_documents_bulk_delete:
+#     enabled: false
+#   dt_iam_user_delete:
+#     enabled: false
+#   dt_iam_group_delete:
+#     enabled: false
+#   dt_filter_segment_delete:
+#     enabled: false
+#   dt_fieldset_delete:
+#     enabled: false
+#   dt_business_calendar_delete:
+#     enabled: false
+#   dt_scheduling_rule_delete:
+#     enabled: false
+#   dt_event_notification_delete:
+#     enabled: false
+#   dt_resource_notification_delete:
+#     enabled: false
+#   dt_self_notification_delete:
+#     enabled: false
+#   dt_environment_share_delete:
+#     enabled: false
+#   dt_direct_share_delete:
+#     enabled: false
+#   dt_email_send:
+#     enabled: false
+#   dt_all_user_app_states_delete:
+#     enabled: false
+#   dt_resource_files_delete:
+#     enabled: false
+
+# Uncomment and populate to selectively disable tools:
+tools: {}
+
+# Available tools by category:
+#
+# DQL:
+#   dt_dql_query, dt_dql_autocomplete, dt_dql_parse
+#
+# Automation:
+#   dt_workflows_list, dt_workflow_get, dt_workflow_create, dt_workflow_update,
+#   dt_workflow_delete, dt_workflow_run, dt_workflow_executions, dt_action_executions,
+#   dt_action_execution_log, dt_execution_log, dt_execution_all_event_logs,
+#   dt_execution_actions_list, dt_execution_tasks_list, dt_execution_task_get,
+#   dt_execution_task_log, dt_execution_task_result, dt_execution_task_input,
+#   dt_execution_task_cancel, dt_execution_transitions_list, dt_workflow_duplicate,
+#   dt_workflow_export, dt_workflow_history_list, dt_workflow_history_get,
+#   dt_workflow_history_restore, dt_workflow_tasks_list, dt_workflow_reset_throttles,
+#   dt_business_calendar_get, dt_business_calendar_create, dt_business_calendar_update,
+#   dt_business_calendar_delete, dt_business_calendar_duplicate,
+#   dt_business_calendar_history_list, dt_scheduling_rule_get, dt_scheduling_rule_create,
+#   dt_scheduling_rule_update, dt_scheduling_rule_delete, dt_scheduling_rule_duplicate,
+#   dt_scheduling_rule_preview, dt_holiday_calendars_list, dt_holiday_calendar_get,
+#   dt_timezones_list, dt_schedule_preview, dt_event_trigger_filter_preview,
+#   dt_automation_settings_get, dt_automation_service_users_list,
+#   dt_automation_user_settings_get, dt_automation_user_permissions_get,
+#   dt_automation_version_get
+#
+# Documents:
+#   dt_documents_list, dt_document_get, dt_document_create, dt_document_update,
+#   dt_document_delete, dt_document_metadata_get, dt_document_content_get,
+#   dt_document_snapshots_list, dt_document_snapshot_get, dt_document_snapshot_restore,
+#   dt_document_lock_inspect, dt_document_lock_acquire, dt_document_lock_release,
+#   dt_document_transfer_owner, dt_environment_shares_list, dt_environment_share_create,
+#   dt_environment_share_get, dt_environment_share_update, dt_environment_share_delete,
+#   dt_environment_share_claim, dt_environment_share_claimers_list, dt_direct_shares_list,
+#   dt_direct_share_create, dt_direct_share_get, dt_direct_share_update,
+#   dt_direct_share_delete, dt_direct_share_recipients_list, dt_direct_share_recipients_add,
+#   dt_direct_share_recipients_remove, dt_trash_documents_list, dt_trash_document_get,
+#   dt_trash_document_delete, dt_trash_document_restore, dt_documents_bulk_delete
+#
+# Davis AI:
+#   dt_davis_analyzers_list, dt_davis_analyze, dt_davis_analyzer_documentation,
+#   dt_davis_analyzer_input_schema, dt_davis_analyzer_result_schema,
+#   dt_davis_analyzer_validate, dt_copilot_nl2dql, dt_copilot_dql2nl,
+#   dt_copilot_document_search, dt_copilot_conversation_feedback,
+#   dt_copilot_nl2dql_feedback, dt_copilot_dql2nl_feedback
+#
+# SLOs:
+#   dt_slos_list, dt_slo_get, dt_slo_create, dt_slo_update, dt_slo_delete,
+#   dt_slo_templates_list, dt_slo_template_get, dt_slo_evaluate,
+#   dt_slo_evaluation_start, dt_slo_evaluation_poll, dt_slo_evaluation_cancel
+#
+# OpenPipeline:
+#   dt_openpipeline_configs_list, dt_openpipeline_config_get,
+#   dt_openpipeline_configuration_update, dt_openpipeline_dql_autocomplete,
+#   dt_openpipeline_dql_verify, dt_openpipeline_matcher_autocomplete,
+#   dt_openpipeline_matcher_verify, dt_openpipeline_lql_to_dql,
+#   dt_openpipeline_processor_preview, dt_openpipeline_technologies_list,
+#   dt_openpipeline_technology_processors_list
+#
+# Notifications:
+#   dt_notifications_list, dt_event_notifications_list, dt_event_notification_create,
+#   dt_event_notification_get, dt_event_notification_update, dt_event_notification_delete,
+#   dt_resource_notifications_list, dt_resource_notification_create,
+#   dt_resource_notification_get_by_resource, dt_resource_notification_get,
+#   dt_resource_notification_update, dt_resource_notification_delete,
+#   dt_self_notifications_list, dt_self_notification_create, dt_self_notification_get,
+#   dt_self_notification_update, dt_self_notification_delete
+#
+# Storage / Buckets:
+#   dt_buckets_list, dt_bucket_get, dt_bucket_update, dt_bucket_truncate,
+#   dt_filter_segments_list, dt_filter_segment_get, dt_filter_segment_create,
+#   dt_filter_segment_update, dt_filter_segment_delete, dt_filter_segments_entity_model,
+#   dt_filter_segments_lean, dt_fieldsets_list, dt_fieldset_get, dt_fieldset_create,
+#   dt_fieldset_update, dt_fieldset_delete, dt_record_deletion_execute,
+#   dt_record_deletion_status, dt_record_deletion_cancel, dt_lookup_table_upload,
+#   dt_lookup_table_test_pattern, dt_resource_files_delete
+#
+# Hub:
+#   dt_hub_items_list, dt_hub_app_releases_list, dt_hub_extension_get,
+#   dt_hub_extension_releases_list, dt_hub_technology_get, dt_hub_categories_list
+#
+# Vulnerabilities:
+#   dt_vulnerabilities_list, dt_vulnerabilities_segment, dt_vulnerability_segment,
+#   dt_vulnerability_affected_entities_list, dt_vulnerability_affected_entities_segment,
+#   dt_vulnerability_affected_entities_muting,
+#   dt_vulnerability_affected_entities_set_tracking_links,
+#   dt_vulnerability_affected_entities_delete_tracking_links,
+#   dt_vulnerability_davis_assessment, dt_vulnerability_davis_assessment_segment,
+#   dt_davis_security_recommendations_list, dt_davis_security_recommendations_segment
+#
+# IAM:
+#   dt_iam_groups_list, dt_iam_policies_list, dt_iam_user_get, dt_iam_user_create,
+#   dt_iam_user_update, dt_iam_user_delete, dt_iam_service_users_list, dt_iam_group_get,
+#   dt_iam_group_create, dt_iam_group_update, dt_iam_group_delete,
+#   dt_environment_license_settings, dt_all_user_app_states_delete
+#
+# Platform / Misc:
+#   dt_environment_info, dt_app_state_get, dt_apps_list, dt_email_send

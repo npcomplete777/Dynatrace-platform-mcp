@@ -10,527 +10,607 @@ import (
 )
 
 // RegisterAutomationExtendedTools registers additional automation tools not in the base set.
-func RegisterAutomationExtendedTools(s *mcpserver.MCPServer, h *Handlers) {
+func RegisterAutomationExtendedTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
 	// ==================== Action Execution Logs ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_action_execution_log",
-		Description: `Get log output of a specific action execution.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":           map[string]interface{}{"type": "string", "description": "Action execution ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_action_execution_log") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_action_execution_log",
+			Description: `Get log output of a specific action execution.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":           map[string]interface{}{"type": "string", "description": "Action execution ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleActionExecutionLog)
+		}, h.handleActionExecutionLog)
+	}
 
 	// ==================== Execution Logs ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_execution_log",
-		Description: `Get log output of a workflow execution.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":           map[string]interface{}{"type": "string", "description": "Execution ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_execution_log") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_execution_log",
+			Description: `Get log output of a workflow execution.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":           map[string]interface{}{"type": "string", "description": "Execution ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleExecutionLog)
+		}, h.handleExecutionLog)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_execution_all_event_logs",
-		Description: `Get all event logs for an execution.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":           map[string]interface{}{"type": "string", "description": "Execution ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_execution_all_event_logs") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_execution_all_event_logs",
+			Description: `Get all event logs for an execution.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":           map[string]interface{}{"type": "string", "description": "Execution ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleExecutionAllEventLogs)
+		}, h.handleExecutionAllEventLogs)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_execution_actions_list",
-		Description: `List actions for an execution.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":           map[string]interface{}{"type": "string", "description": "Execution ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_execution_actions_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_execution_actions_list",
+			Description: `List actions for an execution.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":           map[string]interface{}{"type": "string", "description": "Execution ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleExecutionActionsList)
+		}, h.handleExecutionActionsList)
+	}
 
 	// ==================== Execution Tasks ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_execution_tasks_list",
-		Description: `List tasks for an execution.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_execution_tasks_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_execution_tasks_list",
+			Description: `List tasks for an execution.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"execution_id"},
 			},
-			Required: []string{"execution_id"},
-		},
-	}, h.handleExecutionTasksList)
+		}, h.handleExecutionTasksList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_execution_task_get",
-		Description: `Get details of a specific task in an execution.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
-				"task_id":      map[string]interface{}{"type": "string", "description": "Task ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_execution_task_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_execution_task_get",
+			Description: `Get details of a specific task in an execution.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
+					"task_id":      map[string]interface{}{"type": "string", "description": "Task ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"execution_id", "task_id"},
 			},
-			Required: []string{"execution_id", "task_id"},
-		},
-	}, h.handleExecutionTaskGet)
+		}, h.handleExecutionTaskGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_execution_task_log",
-		Description: `Get log output of a specific task.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
-				"task_id":      map[string]interface{}{"type": "string", "description": "Task ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_execution_task_log") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_execution_task_log",
+			Description: `Get log output of a specific task.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
+					"task_id":      map[string]interface{}{"type": "string", "description": "Task ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"execution_id", "task_id"},
 			},
-			Required: []string{"execution_id", "task_id"},
-		},
-	}, h.handleExecutionTaskLog)
+		}, h.handleExecutionTaskLog)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_execution_task_result",
-		Description: `Get result of a specific task.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
-				"task_id":      map[string]interface{}{"type": "string", "description": "Task ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_execution_task_result") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_execution_task_result",
+			Description: `Get result of a specific task.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
+					"task_id":      map[string]interface{}{"type": "string", "description": "Task ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"execution_id", "task_id"},
 			},
-			Required: []string{"execution_id", "task_id"},
-		},
-	}, h.handleExecutionTaskResult)
+		}, h.handleExecutionTaskResult)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_execution_task_input",
-		Description: `Get input of a specific task.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
-				"task_id":      map[string]interface{}{"type": "string", "description": "Task ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_execution_task_input") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_execution_task_input",
+			Description: `Get input of a specific task.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
+					"task_id":      map[string]interface{}{"type": "string", "description": "Task ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"execution_id", "task_id"},
 			},
-			Required: []string{"execution_id", "task_id"},
-		},
-	}, h.handleExecutionTaskInput)
+		}, h.handleExecutionTaskInput)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_execution_task_cancel",
-		Description: `Cancel a specific task in an execution.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
-				"task_id":      map[string]interface{}{"type": "string", "description": "Task ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_execution_task_cancel") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_execution_task_cancel",
+			Description: `Cancel a specific task in an execution.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
+					"task_id":      map[string]interface{}{"type": "string", "description": "Task ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"execution_id", "task_id"},
 			},
-			Required: []string{"execution_id", "task_id"},
-		},
-	}, h.handleExecutionTaskCancel)
+		}, h.handleExecutionTaskCancel)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_execution_transitions_list",
-		Description: `List transitions for an execution.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
-				"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+	if isEnabled("dt_execution_transitions_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_execution_transitions_list",
+			Description: `List transitions for an execution.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"execution_id": map[string]interface{}{"type": "string", "description": "Execution ID"},
+					"admin_access": map[string]interface{}{"type": "boolean", "description": "Admin access"},
+				},
+				Required: []string{"execution_id"},
 			},
-			Required: []string{"execution_id"},
-		},
-	}, h.handleExecutionTransitionsList)
+		}, h.handleExecutionTransitionsList)
+	}
 
 	// ==================== Workflow Extended ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_duplicate",
-		Description: `Duplicate a workflow.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":   map[string]interface{}{"type": "string", "description": "Workflow ID to duplicate"},
-				"name": map[string]interface{}{"type": "string", "description": "Name for the duplicate"},
+	if isEnabled("dt_workflow_duplicate") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_duplicate",
+			Description: `Duplicate a workflow.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":   map[string]interface{}{"type": "string", "description": "Workflow ID to duplicate"},
+					"name": map[string]interface{}{"type": "string", "description": "Name for the duplicate"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleWorkflowDuplicate)
+		}, h.handleWorkflowDuplicate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_export",
-		Description: `Export a workflow.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Workflow ID"},
+	if isEnabled("dt_workflow_export") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_export",
+			Description: `Export a workflow.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Workflow ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleWorkflowExport)
+		}, h.handleWorkflowExport)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_history_list",
-		Description: `List workflow version history.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Workflow ID"},
+	if isEnabled("dt_workflow_history_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_history_list",
+			Description: `List workflow version history.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Workflow ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleWorkflowHistoryList)
+		}, h.handleWorkflowHistoryList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_history_get",
-		Description: `Get a specific version from workflow history.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":      map[string]interface{}{"type": "string", "description": "Workflow ID"},
-				"version": map[string]interface{}{"type": "integer", "description": "Version number"},
+	if isEnabled("dt_workflow_history_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_history_get",
+			Description: `Get a specific version from workflow history.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":      map[string]interface{}{"type": "string", "description": "Workflow ID"},
+					"version": map[string]interface{}{"type": "integer", "description": "Version number"},
+				},
+				Required: []string{"id", "version"},
 			},
-			Required: []string{"id", "version"},
-		},
-	}, h.handleWorkflowHistoryGet)
+		}, h.handleWorkflowHistoryGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_history_restore",
-		Description: `Restore a workflow to a previous version.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":      map[string]interface{}{"type": "string", "description": "Workflow ID"},
-				"version": map[string]interface{}{"type": "integer", "description": "Version to restore"},
+	if isEnabled("dt_workflow_history_restore") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_history_restore",
+			Description: `Restore a workflow to a previous version.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":      map[string]interface{}{"type": "string", "description": "Workflow ID"},
+					"version": map[string]interface{}{"type": "integer", "description": "Version to restore"},
+				},
+				Required: []string{"id", "version"},
 			},
-			Required: []string{"id", "version"},
-		},
-	}, h.handleWorkflowHistoryRestore)
+		}, h.handleWorkflowHistoryRestore)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_tasks_list",
-		Description: `List tasks defined in a workflow.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Workflow ID"},
+	if isEnabled("dt_workflow_tasks_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_tasks_list",
+			Description: `List tasks defined in a workflow.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Workflow ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleWorkflowTasksList)
+		}, h.handleWorkflowTasksList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_reset_throttles",
-		Description: `Reset throttles for a workflow.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Workflow ID"},
+	if isEnabled("dt_workflow_reset_throttles") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_reset_throttles",
+			Description: `Reset throttles for a workflow.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Workflow ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleWorkflowResetThrottles)
+		}, h.handleWorkflowResetThrottles)
+	}
 
 	// ==================== Business Calendars CRUD ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_business_calendar_get",
-		Description: `Get a business calendar by ID.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Calendar ID"},
+	if isEnabled("dt_business_calendar_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_business_calendar_get",
+			Description: `Get a business calendar by ID.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Calendar ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleBusinessCalendarGet)
+		}, h.handleBusinessCalendarGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_business_calendar_create",
-		Description: `Create a new business calendar.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"title":            map[string]interface{}{"type": "string", "description": "Calendar title"},
-				"description":      map[string]interface{}{"type": "string", "description": "Description"},
-				"timezone":         map[string]interface{}{"type": "string", "description": "Timezone"},
-				"week_start":       map[string]interface{}{"type": "integer", "description": "Week start day (0=Monday)"},
-				"week_days":        map[string]interface{}{"type": "array", "description": "Working days config"},
-				"holidays":         map[string]interface{}{"type": "array", "description": "Holiday definitions"},
-				"holiday_calendar": map[string]interface{}{"type": "string", "description": "Holiday calendar key"},
+	if isEnabled("dt_business_calendar_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_business_calendar_create",
+			Description: `Create a new business calendar.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"title":            map[string]interface{}{"type": "string", "description": "Calendar title"},
+					"description":      map[string]interface{}{"type": "string", "description": "Description"},
+					"timezone":         map[string]interface{}{"type": "string", "description": "Timezone"},
+					"week_start":       map[string]interface{}{"type": "integer", "description": "Week start day (0=Monday)"},
+					"week_days":        map[string]interface{}{"type": "array", "description": "Working days config"},
+					"holidays":         map[string]interface{}{"type": "array", "description": "Holiday definitions"},
+					"holiday_calendar": map[string]interface{}{"type": "string", "description": "Holiday calendar key"},
+				},
+				Required: []string{"title"},
 			},
-			Required: []string{"title"},
-		},
-	}, h.handleBusinessCalendarCreate)
+		}, h.handleBusinessCalendarCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_business_calendar_update",
-		Description: `Update a business calendar.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":               map[string]interface{}{"type": "string", "description": "Calendar ID"},
-				"title":            map[string]interface{}{"type": "string", "description": "Calendar title"},
-				"description":      map[string]interface{}{"type": "string", "description": "Description"},
-				"timezone":         map[string]interface{}{"type": "string", "description": "Timezone"},
-				"week_start":       map[string]interface{}{"type": "integer", "description": "Week start day"},
-				"week_days":        map[string]interface{}{"type": "array", "description": "Working days config"},
-				"holidays":         map[string]interface{}{"type": "array", "description": "Holiday definitions"},
-				"holiday_calendar": map[string]interface{}{"type": "string", "description": "Holiday calendar key"},
+	if isEnabled("dt_business_calendar_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_business_calendar_update",
+			Description: `Update a business calendar.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":               map[string]interface{}{"type": "string", "description": "Calendar ID"},
+					"title":            map[string]interface{}{"type": "string", "description": "Calendar title"},
+					"description":      map[string]interface{}{"type": "string", "description": "Description"},
+					"timezone":         map[string]interface{}{"type": "string", "description": "Timezone"},
+					"week_start":       map[string]interface{}{"type": "integer", "description": "Week start day"},
+					"week_days":        map[string]interface{}{"type": "array", "description": "Working days config"},
+					"holidays":         map[string]interface{}{"type": "array", "description": "Holiday definitions"},
+					"holiday_calendar": map[string]interface{}{"type": "string", "description": "Holiday calendar key"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleBusinessCalendarUpdate)
+		}, h.handleBusinessCalendarUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_business_calendar_delete",
-		Description: `Delete a business calendar.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Calendar ID"},
+	if isEnabled("dt_business_calendar_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_business_calendar_delete",
+			Description: `Delete a business calendar.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Calendar ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleBusinessCalendarDelete)
+		}, h.handleBusinessCalendarDelete)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_business_calendar_duplicate",
-		Description: `Duplicate a business calendar.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":   map[string]interface{}{"type": "string", "description": "Calendar ID to duplicate"},
-				"name": map[string]interface{}{"type": "string", "description": "Name for duplicate"},
+	if isEnabled("dt_business_calendar_duplicate") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_business_calendar_duplicate",
+			Description: `Duplicate a business calendar.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":   map[string]interface{}{"type": "string", "description": "Calendar ID to duplicate"},
+					"name": map[string]interface{}{"type": "string", "description": "Name for duplicate"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleBusinessCalendarDuplicate)
+		}, h.handleBusinessCalendarDuplicate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_business_calendar_history_list",
-		Description: `List business calendar version history.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Calendar ID"},
+	if isEnabled("dt_business_calendar_history_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_business_calendar_history_list",
+			Description: `List business calendar version history.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Calendar ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleBusinessCalendarHistoryList)
+		}, h.handleBusinessCalendarHistoryList)
+	}
 
 	// ==================== Scheduling Rules CRUD ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_scheduling_rule_get",
-		Description: `Get a scheduling rule by ID.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Rule ID"},
+	if isEnabled("dt_scheduling_rule_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_scheduling_rule_get",
+			Description: `Get a scheduling rule by ID.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Rule ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSchedulingRuleGet)
+		}, h.handleSchedulingRuleGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_scheduling_rule_create",
-		Description: `Create a new scheduling rule.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"title":             map[string]interface{}{"type": "string", "description": "Rule title"},
-				"description":       map[string]interface{}{"type": "string", "description": "Description"},
-				"rule_type":         map[string]interface{}{"type": "string", "description": "Rule type (cron, rrule, etc.)"},
-				"rule":              map[string]interface{}{"type": "string", "description": "Rule expression"},
-				"timezone":          map[string]interface{}{"type": "string", "description": "Timezone"},
-				"business_calendar": map[string]interface{}{"type": "string", "description": "Business calendar ID"},
+	if isEnabled("dt_scheduling_rule_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_scheduling_rule_create",
+			Description: `Create a new scheduling rule.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"title":             map[string]interface{}{"type": "string", "description": "Rule title"},
+					"description":       map[string]interface{}{"type": "string", "description": "Description"},
+					"rule_type":         map[string]interface{}{"type": "string", "description": "Rule type (cron, rrule, etc.)"},
+					"rule":              map[string]interface{}{"type": "string", "description": "Rule expression"},
+					"timezone":          map[string]interface{}{"type": "string", "description": "Timezone"},
+					"business_calendar": map[string]interface{}{"type": "string", "description": "Business calendar ID"},
+				},
+				Required: []string{"title", "rule_type", "rule"},
 			},
-			Required: []string{"title", "rule_type", "rule"},
-		},
-	}, h.handleSchedulingRuleCreate)
+		}, h.handleSchedulingRuleCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_scheduling_rule_update",
-		Description: `Update a scheduling rule.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":                map[string]interface{}{"type": "string", "description": "Rule ID"},
-				"title":             map[string]interface{}{"type": "string", "description": "Rule title"},
-				"description":       map[string]interface{}{"type": "string", "description": "Description"},
-				"rule_type":         map[string]interface{}{"type": "string", "description": "Rule type"},
-				"rule":              map[string]interface{}{"type": "string", "description": "Rule expression"},
-				"timezone":          map[string]interface{}{"type": "string", "description": "Timezone"},
-				"business_calendar": map[string]interface{}{"type": "string", "description": "Business calendar ID"},
+	if isEnabled("dt_scheduling_rule_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_scheduling_rule_update",
+			Description: `Update a scheduling rule.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":                map[string]interface{}{"type": "string", "description": "Rule ID"},
+					"title":             map[string]interface{}{"type": "string", "description": "Rule title"},
+					"description":       map[string]interface{}{"type": "string", "description": "Description"},
+					"rule_type":         map[string]interface{}{"type": "string", "description": "Rule type"},
+					"rule":              map[string]interface{}{"type": "string", "description": "Rule expression"},
+					"timezone":          map[string]interface{}{"type": "string", "description": "Timezone"},
+					"business_calendar": map[string]interface{}{"type": "string", "description": "Business calendar ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSchedulingRuleUpdate)
+		}, h.handleSchedulingRuleUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_scheduling_rule_delete",
-		Description: `Delete a scheduling rule.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Rule ID"},
+	if isEnabled("dt_scheduling_rule_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_scheduling_rule_delete",
+			Description: `Delete a scheduling rule.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Rule ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSchedulingRuleDelete)
+		}, h.handleSchedulingRuleDelete)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_scheduling_rule_duplicate",
-		Description: `Duplicate a scheduling rule.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":   map[string]interface{}{"type": "string", "description": "Rule ID to duplicate"},
-				"name": map[string]interface{}{"type": "string", "description": "Name for duplicate"},
+	if isEnabled("dt_scheduling_rule_duplicate") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_scheduling_rule_duplicate",
+			Description: `Duplicate a scheduling rule.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":   map[string]interface{}{"type": "string", "description": "Rule ID to duplicate"},
+					"name": map[string]interface{}{"type": "string", "description": "Name for duplicate"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleSchedulingRuleDuplicate)
+		}, h.handleSchedulingRuleDuplicate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_scheduling_rule_preview",
-		Description: `Preview scheduled times for a rule.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"rule_type":         map[string]interface{}{"type": "string", "description": "Rule type"},
-				"rule":              map[string]interface{}{"type": "string", "description": "Rule expression"},
-				"timezone":          map[string]interface{}{"type": "string", "description": "Timezone"},
-				"business_calendar": map[string]interface{}{"type": "string", "description": "Business calendar ID"},
-				"from":              map[string]interface{}{"type": "string", "description": "Start time (ISO)"},
-				"to":                map[string]interface{}{"type": "string", "description": "End time (ISO)"},
+	if isEnabled("dt_scheduling_rule_preview") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_scheduling_rule_preview",
+			Description: `Preview scheduled times for a rule.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"rule_type":         map[string]interface{}{"type": "string", "description": "Rule type"},
+					"rule":              map[string]interface{}{"type": "string", "description": "Rule expression"},
+					"timezone":          map[string]interface{}{"type": "string", "description": "Timezone"},
+					"business_calendar": map[string]interface{}{"type": "string", "description": "Business calendar ID"},
+					"from":              map[string]interface{}{"type": "string", "description": "Start time (ISO)"},
+					"to":                map[string]interface{}{"type": "string", "description": "End time (ISO)"},
+				},
+				Required: []string{"rule_type", "rule"},
 			},
-			Required: []string{"rule_type", "rule"},
-		},
-	}, h.handleSchedulingRulePreview)
+		}, h.handleSchedulingRulePreview)
+	}
 
 	// ==================== Schedules ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_holiday_calendars_list",
-		Description: `List available holiday calendars.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{},
-		},
-	}, h.handleHolidayCalendarsList)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_holiday_calendar_get",
-		Description: `Get a specific holiday calendar.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"key": map[string]interface{}{"type": "string", "description": "Holiday calendar key"},
+	if isEnabled("dt_holiday_calendars_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_holiday_calendars_list",
+			Description: `List available holiday calendars.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{},
 			},
-			Required: []string{"key"},
-		},
-	}, h.handleHolidayCalendarGet)
+		}, h.handleHolidayCalendarsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_timezones_list",
-		Description: `List available timezones.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{},
-		},
-	}, h.handleTimezonesList)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_schedule_preview",
-		Description: `Preview a schedule.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"schedule": map[string]interface{}{"type": "object", "description": "Schedule configuration"},
-				"from":     map[string]interface{}{"type": "string", "description": "Start time"},
-				"to":       map[string]interface{}{"type": "string", "description": "End time"},
+	if isEnabled("dt_holiday_calendar_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_holiday_calendar_get",
+			Description: `Get a specific holiday calendar.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"key": map[string]interface{}{"type": "string", "description": "Holiday calendar key"},
+				},
+				Required: []string{"key"},
 			},
-			Required: []string{"schedule"},
-		},
-	}, h.handleSchedulePreview)
+		}, h.handleHolidayCalendarGet)
+	}
+
+	if isEnabled("dt_timezones_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_timezones_list",
+			Description: `List available timezones.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{},
+			},
+		}, h.handleTimezonesList)
+	}
+
+	if isEnabled("dt_schedule_preview") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_schedule_preview",
+			Description: `Preview a schedule.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"schedule": map[string]interface{}{"type": "object", "description": "Schedule configuration"},
+					"from":     map[string]interface{}{"type": "string", "description": "Start time"},
+					"to":       map[string]interface{}{"type": "string", "description": "End time"},
+				},
+				Required: []string{"schedule"},
+			},
+		}, h.handleSchedulePreview)
+	}
 
 	// ==================== Event Triggers ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_event_trigger_filter_preview",
-		Description: `Preview event trigger filter.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"filter_query": map[string]interface{}{"type": "string", "description": "DQL filter query"},
-				"event_type":   map[string]interface{}{"type": "string", "description": "Event type"},
+	if isEnabled("dt_event_trigger_filter_preview") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_event_trigger_filter_preview",
+			Description: `Preview event trigger filter.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"filter_query": map[string]interface{}{"type": "string", "description": "DQL filter query"},
+					"event_type":   map[string]interface{}{"type": "string", "description": "Event type"},
+				},
+				Required: []string{"filter_query", "event_type"},
 			},
-			Required: []string{"filter_query", "event_type"},
-		},
-	}, h.handleEventTriggerFilterPreview)
+		}, h.handleEventTriggerFilterPreview)
+	}
 
 	// ==================== Automation Settings ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_automation_settings_get",
-		Description: `Get automation settings.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{},
-		},
-	}, h.handleAutomationSettingsGet)
+	if isEnabled("dt_automation_settings_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_automation_settings_get",
+			Description: `Get automation settings.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{},
+			},
+		}, h.handleAutomationSettingsGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_automation_service_users_list",
-		Description: `List automation service users.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{},
-		},
-	}, h.handleAutomationServiceUsersList)
+	if isEnabled("dt_automation_service_users_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_automation_service_users_list",
+			Description: `List automation service users.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{},
+			},
+		}, h.handleAutomationServiceUsersList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_automation_user_settings_get",
-		Description: `Get current user's automation settings.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{},
-		},
-	}, h.handleAutomationUserSettingsGet)
+	if isEnabled("dt_automation_user_settings_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_automation_user_settings_get",
+			Description: `Get current user's automation settings.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{},
+			},
+		}, h.handleAutomationUserSettingsGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_automation_user_permissions_get",
-		Description: `Get current user's automation permissions.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{},
-		},
-	}, h.handleAutomationUserPermissionsGet)
+	if isEnabled("dt_automation_user_permissions_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_automation_user_permissions_get",
+			Description: `Get current user's automation permissions.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{},
+			},
+		}, h.handleAutomationUserPermissionsGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_automation_version_get",
-		Description: `Get automation engine version.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{},
-		},
-	}, h.handleAutomationVersionGet)
+	if isEnabled("dt_automation_version_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_automation_version_get",
+			Description: `Get automation engine version.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{},
+			},
+		}, h.handleAutomationVersionGet)
+	}
 }
 
 // ==================== Handler Implementations ====================

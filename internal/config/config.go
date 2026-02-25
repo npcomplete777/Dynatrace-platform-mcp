@@ -6,21 +6,36 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
+
+// ToolConfig controls whether an individual MCP tool is enabled.
+type ToolConfig struct {
+	Enabled *bool `yaml:"enabled"`
+}
+
+// yamlConfig is the raw YAML file structure.
+type yamlConfig struct {
+	Tools map[string]ToolConfig `yaml:"tools"`
+}
 
 // Config holds the server configuration.
 type Config struct {
 	BaseURL       string
 	PlatformToken string
 	Debug         bool
+	Tools         map[string]ToolConfig
 }
 
-// Load loads configuration from environment variables.
+// Load loads configuration from environment variables and an optional YAML config file.
+// The config file path is read from DYNATRACE_CONFIG_FILE, defaulting to config.yaml.
 func Load() (*Config, error) {
 	cfg := &Config{
 		BaseURL:       os.Getenv("DT_BASE_URL"),
 		PlatformToken: os.Getenv("DT_PLATFORM_TOKEN"),
 		Debug:         os.Getenv("DT_DEBUG") == "true",
+		Tools:         make(map[string]ToolConfig),
 	}
 
 	// Fall back to alternative env var names
@@ -31,7 +46,49 @@ func Load() (*Config, error) {
 		cfg.PlatformToken = os.Getenv("DYNATRACE_PLATFORM_TOKEN")
 	}
 
+	// Load optional YAML config file
+	configFile := os.Getenv("DYNATRACE_CONFIG_FILE")
+	if configFile == "" {
+		configFile = "config.yaml"
+	}
+	if err := cfg.loadYAML(configFile); err != nil {
+		return nil, err
+	}
+
 	return cfg, nil
+}
+
+// loadYAML reads tool enable/disable settings from the given YAML file.
+// Missing file is silently ignored — all tools default to enabled.
+func (c *Config) loadYAML(path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil // no config file is fine
+		}
+		return fmt.Errorf("reading config file %q: %w", path, err)
+	}
+	var y yamlConfig
+	if err := yaml.Unmarshal(data, &y); err != nil {
+		return fmt.Errorf("parsing config file %q: %w", path, err)
+	}
+	if y.Tools != nil {
+		c.Tools = y.Tools
+	}
+	return nil
+}
+
+// IsEnabled reports whether the named tool should be registered.
+// Tools absent from the config file default to enabled.
+func (c *Config) IsEnabled(name string) bool {
+	tc, ok := c.Tools[name]
+	if !ok {
+		return true
+	}
+	if tc.Enabled == nil {
+		return true
+	}
+	return *tc.Enabled
 }
 
 // Validate validates the configuration.

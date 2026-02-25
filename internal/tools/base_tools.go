@@ -12,98 +12,114 @@ import (
 
 // ==================== Automation Tools ====================
 
-func RegisterAutomationTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflows_list",
-		Description: "List automation workflows with optional filtering and pagination.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"limit":  map[string]interface{}{"type": "integer", "description": "Results per page"},
-				"offset": map[string]interface{}{"type": "integer", "description": "Pagination offset"},
-				"search": map[string]interface{}{"type": "string", "description": "Search term"},
+func RegisterAutomationTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_workflows_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflows_list",
+			Description: "List automation workflows with optional filtering and pagination.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"limit":  map[string]interface{}{"type": "integer", "description": "Results per page"},
+					"offset": map[string]interface{}{"type": "integer", "description": "Pagination offset"},
+					"search": map[string]interface{}{"type": "string", "description": "Search term"},
+				},
 			},
-		},
-	}, h.handleWorkflowsList)
+		}, h.handleWorkflowsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_get",
-		Description: "Get details of a specific workflow by ID.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Workflow ID"}},
-			Required:   []string{"id"},
-		},
-	}, h.handleWorkflowGet)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_create",
-		Description: "Create a new automation workflow.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"workflow": map[string]interface{}{"type": "object", "description": "Workflow definition"}},
-			Required:   []string{"workflow"},
-		},
-	}, h.handleWorkflowCreate)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_update",
-		Description: "Update an existing workflow.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":       map[string]interface{}{"type": "string", "description": "Workflow ID"},
-				"workflow": map[string]interface{}{"type": "object", "description": "Updated workflow definition"},
+	if isEnabled("dt_workflow_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_get",
+			Description: "Get details of a specific workflow by ID.",
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Workflow ID"}},
+				Required:   []string{"id"},
 			},
-			Required: []string{"id", "workflow"},
-		},
-	}, h.handleWorkflowUpdate)
+		}, h.handleWorkflowGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_delete",
-		Description: "Delete a workflow.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Workflow ID"}},
-			Required:   []string{"id"},
-		},
-	}, h.handleWorkflowDelete)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_run",
-		Description: "Trigger a workflow execution.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":     map[string]interface{}{"type": "string", "description": "Workflow ID"},
-				"params": map[string]interface{}{"type": "object", "description": "Input parameters"},
+	if isEnabled("dt_workflow_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_create",
+			Description: "Create a new automation workflow.",
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{"workflow": map[string]interface{}{"type": "object", "description": "Workflow definition"}},
+				Required:   []string{"workflow"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleWorkflowRun)
+		}, h.handleWorkflowCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_workflow_executions",
-		Description: "List executions of a workflow.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"workflow_id": map[string]interface{}{"type": "string", "description": "Workflow ID"},
-				"limit":       map[string]interface{}{"type": "integer", "description": "Results per page"},
+	if isEnabled("dt_workflow_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_update",
+			Description: "Update an existing workflow.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":       map[string]interface{}{"type": "string", "description": "Workflow ID"},
+					"workflow": map[string]interface{}{"type": "object", "description": "Updated workflow definition"},
+				},
+				Required: []string{"id", "workflow"},
 			},
-		},
-	}, h.handleWorkflowExecutions)
+		}, h.handleWorkflowUpdate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_action_executions",
-		Description: "List action executions.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"limit": map[string]interface{}{"type": "integer", "description": "Results per page"},
+	if isEnabled("dt_workflow_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_delete",
+			Description: "Delete a workflow.",
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Workflow ID"}},
+				Required:   []string{"id"},
 			},
-		},
-	}, h.handleActionExecutions)
+		}, h.handleWorkflowDelete)
+	}
+
+	if isEnabled("dt_workflow_run") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_run",
+			Description: "Trigger a workflow execution.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":     map[string]interface{}{"type": "string", "description": "Workflow ID"},
+					"params": map[string]interface{}{"type": "object", "description": "Input parameters"},
+				},
+				Required: []string{"id"},
+			},
+		}, h.handleWorkflowRun)
+	}
+
+	if isEnabled("dt_workflow_executions") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_workflow_executions",
+			Description: "List executions of a workflow.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"workflow_id": map[string]interface{}{"type": "string", "description": "Workflow ID"},
+					"limit":       map[string]interface{}{"type": "integer", "description": "Results per page"},
+				},
+			},
+		}, h.handleWorkflowExecutions)
+	}
+
+	if isEnabled("dt_action_executions") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_action_executions",
+			Description: "List action executions.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"limit": map[string]interface{}{"type": "integer", "description": "Results per page"},
+				},
+			},
+		}, h.handleActionExecutions)
+	}
 }
 
 func (h *Handlers) handleWorkflowsList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -246,65 +262,75 @@ func (h *Handlers) handleActionExecutions(ctx context.Context, req mcp.CallToolR
 
 // ==================== Document Tools ====================
 
-func RegisterDocumentTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_documents_list",
-		Description: "List Grail documents with optional filtering.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"filter": map[string]interface{}{"type": "string", "description": "Filter expression"},
-				"limit":  map[string]interface{}{"type": "integer", "description": "Max results"},
+func RegisterDocumentTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_documents_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_documents_list",
+			Description: "List Grail documents with optional filtering.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"filter": map[string]interface{}{"type": "string", "description": "Filter expression"},
+					"limit":  map[string]interface{}{"type": "integer", "description": "Max results"},
+				},
 			},
-		},
-	}, h.handleDocumentsList)
+		}, h.handleDocumentsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_get",
-		Description: "Get a document by ID.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Document ID"}},
-			Required:   []string{"id"},
-		},
-	}, h.handleDocumentGet)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_create",
-		Description: "Create a new Grail document (dashboard, notebook, etc).",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name":    map[string]interface{}{"type": "string", "description": "Document name"},
-				"type":    map[string]interface{}{"type": "string", "description": "Document type (dashboard, notebook)"},
-				"content": map[string]interface{}{"type": "object", "description": "Document content"},
+	if isEnabled("dt_document_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_get",
+			Description: "Get a document by ID.",
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Document ID"}},
+				Required:   []string{"id"},
 			},
-			Required: []string{"name", "type", "content"},
-		},
-	}, h.handleDocumentCreate)
+		}, h.handleDocumentGet)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_update",
-		Description: "Update an existing document.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":      map[string]interface{}{"type": "string", "description": "Document ID"},
-				"content": map[string]interface{}{"type": "object", "description": "Updated content"},
+	if isEnabled("dt_document_create") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_create",
+			Description: "Create a new Grail document (dashboard, notebook, etc).",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"name":    map[string]interface{}{"type": "string", "description": "Document name"},
+					"type":    map[string]interface{}{"type": "string", "description": "Document type (dashboard, notebook)"},
+					"content": map[string]interface{}{"type": "object", "description": "Document content"},
+				},
+				Required: []string{"name", "type", "content"},
 			},
-			Required: []string{"id", "content"},
-		},
-	}, h.handleDocumentUpdate)
+		}, h.handleDocumentCreate)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_document_delete",
-		Description: "Delete a document.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Document ID"}},
-			Required:   []string{"id"},
-		},
-	}, h.handleDocumentDelete)
+	if isEnabled("dt_document_update") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_update",
+			Description: "Update an existing document.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":      map[string]interface{}{"type": "string", "description": "Document ID"},
+					"content": map[string]interface{}{"type": "object", "description": "Updated content"},
+				},
+				Required: []string{"id", "content"},
+			},
+		}, h.handleDocumentUpdate)
+	}
+
+	if isEnabled("dt_document_delete") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_document_delete",
+			Description: "Delete a document.",
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Document ID"}},
+				Required:   []string{"id"},
+			},
+		}, h.handleDocumentDelete)
+	}
 }
 
 func (h *Handlers) handleDocumentsList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -397,25 +423,29 @@ func (h *Handlers) handleDocumentDelete(ctx context.Context, req mcp.CallToolReq
 
 // ==================== Davis Tools ====================
 
-func RegisterDavisTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_davis_analyzers_list",
-		Description: "List available Davis analyzers.",
-		InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
-	}, h.handleDavisAnalyzersList)
+func RegisterDavisTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_davis_analyzers_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_davis_analyzers_list",
+			Description: "List available Davis analyzers.",
+			InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
+		}, h.handleDavisAnalyzersList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_davis_analyze",
-		Description: "Run a Davis analyzer.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"analyzer_name": map[string]interface{}{"type": "string", "description": "Analyzer name"},
-				"input":         map[string]interface{}{"type": "object", "description": "Analyzer input"},
+	if isEnabled("dt_davis_analyze") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_davis_analyze",
+			Description: "Run a Davis analyzer.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"analyzer_name": map[string]interface{}{"type": "string", "description": "Analyzer name"},
+					"input":         map[string]interface{}{"type": "object", "description": "Analyzer input"},
+				},
+				Required: []string{"analyzer_name", "input"},
 			},
-			Required: []string{"analyzer_name", "input"},
-		},
-	}, h.handleDavisAnalyze)
+		}, h.handleDavisAnalyze)
+	}
 }
 
 func (h *Handlers) handleDavisAnalyzersList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -445,294 +475,28 @@ func (h *Handlers) handleDavisAnalyze(ctx context.Context, req mcp.CallToolReque
 	return toolResult(resp.Body), nil
 }
 
-// ==================== SLO Tools ====================
-
-func RegisterSLOTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slos_list",
-		Description: "List Service Level Objectives (SLOs) with pagination support.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"page_size": map[string]interface{}{"type": "integer", "description": "Number of SLOs per page (max 100)"},
-			},
-		},
-	}, h.handleSLOsList)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_get",
-		Description: "Get details of a specific SLO by ID, including SLI reference, criteria, and tags.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "SLO ID"}},
-			Required:   []string{"id"},
-		},
-	}, h.handleSLOGet)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_create",
-		Description: "Create a new SLO. Use either customSli (for DQL-based indicators) or sliReference (for built-in templates). The DQL indicator must produce a field named 'sli' with a value between 0-100.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"name":        map[string]interface{}{"type": "string", "description": "SLO name"},
-				"description": map[string]interface{}{"type": "string", "description": "SLO description"},
-				"customSli": map[string]interface{}{
-					"type":        "object",
-					"description": "Custom SLI using DQL query. Query must output a field named 'sli' (0-100)",
-					"properties": map[string]interface{}{
-						"indicator": map[string]interface{}{"type": "string", "description": "DQL query producing 'sli' field. Examples: 'timeseries sli=avg(dt.host.cpu.idle)' or 'fetch logs | summarize total=count(), errors=countIf(loglevel==\"ERROR\") | fieldsAdd sli=((total-errors)/total)*100'"},
-					},
-				},
-				"sliReference": map[string]interface{}{
-					"type":        "object",
-					"description": "SLI template reference (alternative to customSli)",
-					"properties": map[string]interface{}{
-						"templateId": map[string]interface{}{"type": "string", "description": "SLI template ID"},
-						"variables": map[string]interface{}{
-							"type":        "array",
-							"description": "Template variables (name/value pairs)",
-							"items": map[string]interface{}{
-								"type": "object",
-								"properties": map[string]interface{}{
-									"name":  map[string]interface{}{"type": "string"},
-									"value": map[string]interface{}{"type": "string"},
-								},
-							},
-						},
-					},
-				},
-				"criteria": map[string]interface{}{
-					"type":        "array",
-					"description": "SLO criteria with timeframe, target, and optional warning threshold",
-					"items": map[string]interface{}{
-						"type": "object",
-						"properties": map[string]interface{}{
-							"timeframeFrom": map[string]interface{}{"type": "string", "description": "Start of timeframe (e.g., 'now-7d')"},
-							"timeframeTo":   map[string]interface{}{"type": "string", "description": "End of timeframe (e.g., 'now')"},
-							"target":        map[string]interface{}{"type": "number", "description": "Target percentage (0-100)"},
-							"warning":       map[string]interface{}{"type": "number", "description": "Warning threshold percentage (0-100)"},
-						},
-					},
-				},
-				"tags": map[string]interface{}{
-					"type":        "array",
-					"description": "Tags for the SLO (e.g., 'Stage:DEV')",
-					"items":       map[string]interface{}{"type": "string"},
-				},
-			},
-			Required: []string{"name", "criteria"},
-		},
-	}, h.handleSLOCreate)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_update",
-		Description: "Update an existing SLO.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "SLO ID"},
-				"slo": map[string]interface{}{
-					"type":        "object",
-					"description": "Updated SLO definition (name, description, sliReference, criteria, tags)",
-				},
-			},
-			Required: []string{"id", "slo"},
-		},
-	}, h.handleSLOUpdate)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_delete",
-		Description: "Delete an SLO by ID.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "SLO ID"}},
-			Required:   []string{"id"},
-		},
-	}, h.handleSLODelete)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_templates_list",
-		Description: "List built-in SLO objective templates. Templates provide pre-defined DQL indicators for common use cases like service availability, service performance, host CPU usage, and Kubernetes efficiency metrics.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"page_size": map[string]interface{}{"type": "integer", "description": "Number of templates per page (max 400)"},
-			},
-		},
-	}, h.handleSLOTemplatesList)
-
-	s.AddTool(mcp.Tool{
-		Name:        "dt_slo_template_get",
-		Description: "Get details of a specific SLO objective template by ID, including the DQL indicator query and required variables.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Template ID"}},
-			Required:   []string{"id"},
-		},
-	}, h.handleSLOTemplateGet)
-}
-
-func (h *Handlers) handleSLOsList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	params := make(map[string]string)
-	if l := getIntParam(req.Params.Arguments, "page_size", 0); l > 0 {
-		params["page-size"] = fmt.Sprintf("%d", l)
-	}
-	resp, err := h.Client.Get(ctx, "/platform/slo/v1/slos", client.WithQueryParams(params))
-	if err != nil {
-		return toolError(err), nil
-	}
-	if !resp.IsSuccess() {
-		return toolError(fmt.Errorf(client.FormatError(resp))), nil
-	}
-	return toolResult(resp.Body), nil
-}
-
-func (h *Handlers) handleSLOGet(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	id := getStringParam(req.Params.Arguments, "id")
-	if id == "" {
-		return toolError(fmt.Errorf("id is required")), nil
-	}
-	resp, err := h.Client.Get(ctx, "/platform/slo/v1/slos/"+id)
-	if err != nil {
-		return toolError(err), nil
-	}
-	if !resp.IsSuccess() {
-		return toolError(fmt.Errorf(client.FormatError(resp))), nil
-	}
-	return toolResult(resp.Body), nil
-}
-
-func (h *Handlers) handleSLOCreate(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	// Build SLO payload from individual parameters
-	slo := make(map[string]interface{})
-
-	if name := getStringParam(req.Params.Arguments, "name"); name != "" {
-		slo["name"] = name
-	} else {
-		return toolError(fmt.Errorf("name is required")), nil
-	}
-
-	if desc := getStringParam(req.Params.Arguments, "description"); desc != "" {
-		slo["description"] = desc
-	}
-
-	// Support either customSli or sliReference (one is required)
-	customSli := getMapParam(req.Params.Arguments, "customSli")
-	sliRef := getMapParam(req.Params.Arguments, "sliReference")
-
-	if customSli != nil {
-		slo["customSli"] = customSli
-	} else if sliRef != nil {
-		slo["sliReference"] = sliRef
-	} else {
-		return toolError(fmt.Errorf("either customSli or sliReference is required")), nil
-	}
-
-	if criteria := getSliceParam(req.Params.Arguments, "criteria"); criteria != nil {
-		slo["criteria"] = criteria
-	} else {
-		return toolError(fmt.Errorf("criteria is required")), nil
-	}
-
-	if tags := getStringSliceParam(req.Params.Arguments, "tags"); tags != nil {
-		slo["tags"] = tags
-	} else {
-		slo["tags"] = []string{}
-	}
-
-	resp, err := h.Client.Post(ctx, "/platform/slo/v1/slos", slo)
-	if err != nil {
-		return toolError(err), nil
-	}
-	if !resp.IsSuccess() {
-		return toolError(fmt.Errorf(client.FormatError(resp))), nil
-	}
-	return toolResult(resp.Body), nil
-}
-
-func (h *Handlers) handleSLOUpdate(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	id := getStringParam(req.Params.Arguments, "id")
-	if id == "" {
-		return toolError(fmt.Errorf("id is required")), nil
-	}
-	slo := getMapParam(req.Params.Arguments, "slo")
-	if slo == nil {
-		return toolError(fmt.Errorf("slo is required")), nil
-	}
-	resp, err := h.Client.Put(ctx, "/platform/slo/v1/slos/"+id, slo)
-	if err != nil {
-		return toolError(err), nil
-	}
-	if !resp.IsSuccess() {
-		return toolError(fmt.Errorf(client.FormatError(resp))), nil
-	}
-	return toolResult(resp.Body), nil
-}
-
-func (h *Handlers) handleSLODelete(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	id := getStringParam(req.Params.Arguments, "id")
-	if id == "" {
-		return toolError(fmt.Errorf("id is required")), nil
-	}
-	resp, err := h.Client.Delete(ctx, "/platform/slo/v1/slos/"+id)
-	if err != nil {
-		return toolError(err), nil
-	}
-	if !resp.IsSuccess() {
-		return toolError(fmt.Errorf(client.FormatError(resp))), nil
-	}
-	return toolResult(resp.Body), nil
-}
-
-func (h *Handlers) handleSLOTemplatesList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	params := make(map[string]string)
-	if l := getIntParam(req.Params.Arguments, "page_size", 0); l > 0 {
-		params["page-size"] = fmt.Sprintf("%d", l)
-	}
-	resp, err := h.Client.Get(ctx, "/platform/slo/v1/objective-templates", client.WithQueryParams(params))
-	if err != nil {
-		return toolError(err), nil
-	}
-	if !resp.IsSuccess() {
-		return toolError(fmt.Errorf(client.FormatError(resp))), nil
-	}
-	return toolResult(resp.Body), nil
-}
-
-func (h *Handlers) handleSLOTemplateGet(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	id := getStringParam(req.Params.Arguments, "id")
-	if id == "" {
-		return toolError(fmt.Errorf("id is required")), nil
-	}
-	resp, err := h.Client.Get(ctx, "/platform/slo/v1/objective-templates/"+id)
-	if err != nil {
-		return toolError(err), nil
-	}
-	if !resp.IsSuccess() {
-		return toolError(fmt.Errorf(client.FormatError(resp))), nil
-	}
-	return toolResult(resp.Body), nil
-}
-
 // ==================== OpenPipeline Tools ====================
 
-func RegisterOpenPipelineTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_configs_list",
-		Description: "List OpenPipeline configurations.",
-		InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
-	}, h.handleOpenPipelineConfigsList)
+func RegisterOpenPipelineTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_openpipeline_configs_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_configs_list",
+			Description: "List OpenPipeline configurations.",
+			InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
+		}, h.handleOpenPipelineConfigsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_openpipeline_config_get",
-		Description: "Get an OpenPipeline configuration.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Config ID"}},
-			Required:   []string{"id"},
-		},
-	}, h.handleOpenPipelineConfigGet)
+	if isEnabled("dt_openpipeline_config_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_openpipeline_config_get",
+			Description: "Get an OpenPipeline configuration.",
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{"id": map[string]interface{}{"type": "string", "description": "Config ID"}},
+				Required:   []string{"id"},
+			},
+		}, h.handleOpenPipelineConfigGet)
+	}
 }
 
 func (h *Handlers) handleOpenPipelineConfigsList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -763,12 +527,14 @@ func (h *Handlers) handleOpenPipelineConfigGet(ctx context.Context, req mcp.Call
 
 // ==================== Notification Tools ====================
 
-func RegisterNotificationTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_notifications_list",
-		Description: "List notification configurations.",
-		InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
-	}, h.handleNotificationsList)
+func RegisterNotificationTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_notifications_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_notifications_list",
+			Description: "List notification configurations.",
+			InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
+		}, h.handleNotificationsList)
+	}
 }
 
 func (h *Handlers) handleNotificationsList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -784,22 +550,26 @@ func (h *Handlers) handleNotificationsList(ctx context.Context, req mcp.CallTool
 
 // ==================== Storage Tools ====================
 
-func RegisterStorageTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_buckets_list",
-		Description: "List Grail buckets.",
-		InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
-	}, h.handleBucketsList)
+func RegisterStorageTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_buckets_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_buckets_list",
+			Description: "List Grail buckets.",
+			InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
+		}, h.handleBucketsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_bucket_get",
-		Description: "Get bucket details.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"name": map[string]interface{}{"type": "string", "description": "Bucket name"}},
-			Required:   []string{"name"},
-		},
-	}, h.handleBucketGet)
+	if isEnabled("dt_bucket_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_bucket_get",
+			Description: "Get bucket details.",
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{"name": map[string]interface{}{"type": "string", "description": "Bucket name"}},
+				Required:   []string{"name"},
+			},
+		}, h.handleBucketGet)
+	}
 }
 
 func (h *Handlers) handleBucketsList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -830,17 +600,19 @@ func (h *Handlers) handleBucketGet(ctx context.Context, req mcp.CallToolRequest)
 
 // ==================== Vulnerability Tools ====================
 
-func RegisterVulnerabilityTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_vulnerabilities_list",
-		Description: "List security vulnerabilities.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"limit": map[string]interface{}{"type": "integer", "description": "Max results"},
+func RegisterVulnerabilityTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_vulnerabilities_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_vulnerabilities_list",
+			Description: "List security vulnerabilities.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"limit": map[string]interface{}{"type": "integer", "description": "Max results"},
+				},
 			},
-		},
-	}, h.handleVulnerabilitiesList)
+		}, h.handleVulnerabilitiesList)
+	}
 }
 
 func (h *Handlers) handleVulnerabilitiesList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -860,17 +632,19 @@ func (h *Handlers) handleVulnerabilitiesList(ctx context.Context, req mcp.CallTo
 
 // ==================== Hub Tools ====================
 
-func RegisterHubTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_hub_items_list",
-		Description: "List Hub items (extensions, apps).",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"type": map[string]interface{}{"type": "string", "description": "Item type filter"},
+func RegisterHubTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_hub_items_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_hub_items_list",
+			Description: "List Hub items (extensions, apps).",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"type": map[string]interface{}{"type": "string", "description": "Item type filter"},
+				},
 			},
-		},
-	}, h.handleHubItemsList)
+		}, h.handleHubItemsList)
+	}
 }
 
 func (h *Handlers) handleHubItemsList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -890,18 +664,22 @@ func (h *Handlers) handleHubItemsList(ctx context.Context, req mcp.CallToolReque
 
 // ==================== IAM Tools ====================
 
-func RegisterIAMTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_iam_groups_list",
-		Description: "List IAM groups.",
-		InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
-	}, h.handleIAMGroupsList)
+func RegisterIAMTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_iam_groups_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_iam_groups_list",
+			Description: "List IAM groups.",
+			InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
+		}, h.handleIAMGroupsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_iam_policies_list",
-		Description: "List IAM policies.",
-		InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
-	}, h.handleIAMPoliciesList)
+	if isEnabled("dt_iam_policies_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_iam_policies_list",
+			Description: "List IAM policies.",
+			InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
+		}, h.handleIAMPoliciesList)
+	}
 }
 
 func (h *Handlers) handleIAMGroupsList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -932,12 +710,14 @@ func (h *Handlers) handleIAMPoliciesList(ctx context.Context, req mcp.CallToolRe
 
 // ==================== Platform Tools ====================
 
-func RegisterPlatformTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_environment_info",
-		Description: "Get environment information.",
-		InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
-	}, h.handleEnvironmentInfo)
+func RegisterPlatformTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_environment_info") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_environment_info",
+			Description: "Get environment information.",
+			InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
+		}, h.handleEnvironmentInfo)
+	}
 }
 
 func (h *Handlers) handleEnvironmentInfo(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -953,16 +733,18 @@ func (h *Handlers) handleEnvironmentInfo(ctx context.Context, req mcp.CallToolRe
 
 // ==================== State Tools ====================
 
-func RegisterStateTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_app_state_get",
-		Description: "Get app state.",
-		InputSchema: mcp.ToolInputSchema{
-			Type:       "object",
-			Properties: map[string]interface{}{"app_id": map[string]interface{}{"type": "string", "description": "App ID"}},
-			Required:   []string{"app_id"},
-		},
-	}, h.handleAppStateGet)
+func RegisterStateTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_app_state_get") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_app_state_get",
+			Description: "Get app state.",
+			InputSchema: mcp.ToolInputSchema{
+				Type:       "object",
+				Properties: map[string]interface{}{"app_id": map[string]interface{}{"type": "string", "description": "App ID"}},
+				Required:   []string{"app_id"},
+			},
+		}, h.handleAppStateGet)
+	}
 }
 
 func (h *Handlers) handleAppStateGet(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -982,12 +764,14 @@ func (h *Handlers) handleAppStateGet(ctx context.Context, req mcp.CallToolReques
 
 // ==================== AppEngine Tools ====================
 
-func RegisterAppEngineTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_apps_list",
-		Description: "List installed apps.",
-		InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
-	}, h.handleAppsList)
+func RegisterAppEngineTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_apps_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_apps_list",
+			Description: "List installed apps.",
+			InputSchema: mcp.ToolInputSchema{Type: "object", Properties: map[string]interface{}{}},
+		}, h.handleAppsList)
+	}
 }
 
 func (h *Handlers) handleAppsList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -1003,20 +787,22 @@ func (h *Handlers) handleAppsList(ctx context.Context, req mcp.CallToolRequest) 
 
 // ==================== Email Tools ====================
 
-func RegisterEmailTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name:        "dt_email_send",
-		Description: "Send an email notification.",
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"to":      map[string]interface{}{"type": "array", "items": map[string]interface{}{"type": "string"}, "description": "Recipients"},
-				"subject": map[string]interface{}{"type": "string", "description": "Email subject"},
-				"body":    map[string]interface{}{"type": "string", "description": "Email body"},
+func RegisterEmailTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_email_send") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_email_send",
+			Description: "Send an email notification.",
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"to":      map[string]interface{}{"type": "array", "items": map[string]interface{}{"type": "string"}, "description": "Recipients"},
+					"subject": map[string]interface{}{"type": "string", "description": "Email subject"},
+					"body":    map[string]interface{}{"type": "string", "description": "Email body"},
+				},
+				Required: []string{"to", "subject", "body"},
 			},
-			Required: []string{"to", "subject", "body"},
-		},
-	}, h.handleEmailSend)
+		}, h.handleEmailSend)
+	}
 }
 
 func (h *Handlers) handleEmailSend(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {

@@ -10,74 +10,80 @@ import (
 )
 
 // RegisterDQLTools registers DQL query tools.
-func RegisterDQLTools(s *mcpserver.MCPServer, h *Handlers) {
-	s.AddTool(mcp.Tool{
-		Name: "dt_dql_query",
-		Description: `Execute a DQL (Dynatrace Query Language) query against Grail.
-
-This is the primary tool for querying Dynatrace data. DQL supports:
-- Logs: fetch logs | filter ...
-- Metrics: timeseries avg(dt.host.cpu.usage)
-- Events: fetch events | filter ...
-- Entities: fetch dt.entity.service | fields ...
-- Bizevents: fetch bizevents | filter ...
-- Spans: fetch spans | filter ...
-
-Args:
-  - query (string, required): The DQL query to execute
-  - max_result_records (int, optional): Maximum records to return (default: 1000)
-  - request_timeout_ms (int, optional): Timeout in milliseconds (default: 60000)
-
-Returns:
-  Query results with records and metadata.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"query":              map[string]interface{}{"type": "string", "description": "DQL query to execute"},
-				"max_result_records": map[string]interface{}{"type": "integer", "description": "Max records (default 1000)"},
-				"request_timeout_ms": map[string]interface{}{"type": "integer", "description": "Timeout in ms (default 60000)"},
+func RegisterDQLTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
+	if isEnabled("dt_dql_query") {
+		s.AddTool(mcp.Tool{
+			Name: "dt_dql_query",
+			Description: `Execute a DQL (Dynatrace Query Language) query against Grail.
+	
+	This is the primary tool for querying Dynatrace data. DQL supports:
+	- Logs: fetch logs | filter ...
+	- Metrics: timeseries avg(dt.host.cpu.usage)
+	- Events: fetch events | filter ...
+	- Entities: fetch dt.entity.service | fields ...
+	- Bizevents: fetch bizevents | filter ...
+	- Spans: fetch spans | filter ...
+	
+	Args:
+	  - query (string, required): The DQL query to execute
+	  - max_result_records (int, optional): Maximum records to return (default: 1000)
+	  - request_timeout_ms (int, optional): Timeout in milliseconds (default: 60000)
+	
+	Returns:
+	  Query results with records and metadata.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"query":              map[string]interface{}{"type": "string", "description": "DQL query to execute"},
+					"max_result_records": map[string]interface{}{"type": "integer", "description": "Max records (default 1000)"},
+					"request_timeout_ms": map[string]interface{}{"type": "integer", "description": "Timeout in ms (default 60000)"},
+				},
+				Required: []string{"query"},
 			},
-			Required: []string{"query"},
-		},
-	}, h.handleDQLQuery)
+		}, h.handleDQLQuery)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name: "dt_dql_autocomplete",
-		Description: `Get DQL query autocomplete suggestions.
-
-Args:
-  - query (string, required): Partial DQL query
-  - cursor_position (int, optional): Cursor position for context-aware suggestions
-
-Returns:
-  Autocomplete suggestions for the query.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"query":           map[string]interface{}{"type": "string", "description": "Partial DQL query"},
-				"cursor_position": map[string]interface{}{"type": "integer", "description": "Cursor position"},
+	if isEnabled("dt_dql_autocomplete") {
+		s.AddTool(mcp.Tool{
+			Name: "dt_dql_autocomplete",
+			Description: `Get DQL query autocomplete suggestions.
+	
+	Args:
+	  - query (string, required): Partial DQL query
+	  - cursor_position (int, optional): Cursor position for context-aware suggestions
+	
+	Returns:
+	  Autocomplete suggestions for the query.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"query":           map[string]interface{}{"type": "string", "description": "Partial DQL query"},
+					"cursor_position": map[string]interface{}{"type": "integer", "description": "Cursor position"},
+				},
+				Required: []string{"query"},
 			},
-			Required: []string{"query"},
-		},
-	}, h.handleDQLAutocomplete)
+		}, h.handleDQLAutocomplete)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name: "dt_dql_parse",
-		Description: `Parse and validate a DQL query without executing it.
-
-Args:
-  - query (string, required): DQL query to parse
-
-Returns:
-  Parse result with AST or validation errors.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"query": map[string]interface{}{"type": "string", "description": "DQL query to parse"},
+	if isEnabled("dt_dql_parse") {
+		s.AddTool(mcp.Tool{
+			Name: "dt_dql_parse",
+			Description: `Parse and validate a DQL query without executing it.
+	
+	Args:
+	  - query (string, required): DQL query to parse
+	
+	Returns:
+	  Parse result with AST or validation errors.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"query": map[string]interface{}{"type": "string", "description": "DQL query to parse"},
+				},
+				Required: []string{"query"},
 			},
-			Required: []string{"query"},
-		},
-	}, h.handleDQLParse)
+		}, h.handleDQLParse)
+	}
 }
 
 // DQL Handlers

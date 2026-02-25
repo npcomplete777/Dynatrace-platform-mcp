@@ -10,159 +10,181 @@ import (
 )
 
 // RegisterVulnerabilitiesExtendedTools registers additional vulnerability/security tools.
-func RegisterVulnerabilitiesExtendedTools(s *mcpserver.MCPServer, h *Handlers) {
+func RegisterVulnerabilitiesExtendedTools(s *mcpserver.MCPServer, h *Handlers, isEnabled func(string) bool) {
 	// ==================== Vulnerabilities Segmentation ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_vulnerabilities_segment",
-		Description: `Get vulnerabilities with segmentation (grouping/aggregation).`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"filter":       map[string]interface{}{"type": "string", "description": "Filter query"},
-				"segment_by":   map[string]interface{}{"type": "array", "description": "Fields to segment by"},
-				"aggregations": map[string]interface{}{"type": "array", "description": "Aggregation functions"},
+	if isEnabled("dt_vulnerabilities_segment") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_vulnerabilities_segment",
+			Description: `Get vulnerabilities with segmentation (grouping/aggregation).`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"filter":       map[string]interface{}{"type": "string", "description": "Filter query"},
+					"segment_by":   map[string]interface{}{"type": "array", "description": "Fields to segment by"},
+					"aggregations": map[string]interface{}{"type": "array", "description": "Aggregation functions"},
+				},
 			},
-		},
-	}, h.handleVulnerabilitiesSegment)
+		}, h.handleVulnerabilitiesSegment)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_vulnerability_segment",
-		Description: `Get a specific vulnerability with segmentation.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":           map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
-				"segment_by":   map[string]interface{}{"type": "array", "description": "Fields to segment by"},
-				"aggregations": map[string]interface{}{"type": "array", "description": "Aggregation functions"},
+	if isEnabled("dt_vulnerability_segment") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_vulnerability_segment",
+			Description: `Get a specific vulnerability with segmentation.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":           map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
+					"segment_by":   map[string]interface{}{"type": "array", "description": "Fields to segment by"},
+					"aggregations": map[string]interface{}{"type": "array", "description": "Aggregation functions"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleVulnerabilitySegment)
+		}, h.handleVulnerabilitySegment)
+	}
 
 	// ==================== Affected Entities ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_vulnerability_affected_entities_list",
-		Description: `List entities affected by a vulnerability.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":        map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
-				"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
-				"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+	if isEnabled("dt_vulnerability_affected_entities_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_vulnerability_affected_entities_list",
+			Description: `List entities affected by a vulnerability.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":        map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
+					"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
+					"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleVulnerabilityAffectedEntitiesList)
+		}, h.handleVulnerabilityAffectedEntitiesList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_vulnerability_affected_entities_segment",
-		Description: `Get affected entities with segmentation.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":           map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
-				"segment_by":   map[string]interface{}{"type": "array", "description": "Fields to segment by"},
-				"aggregations": map[string]interface{}{"type": "array", "description": "Aggregations"},
+	if isEnabled("dt_vulnerability_affected_entities_segment") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_vulnerability_affected_entities_segment",
+			Description: `Get affected entities with segmentation.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":           map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
+					"segment_by":   map[string]interface{}{"type": "array", "description": "Fields to segment by"},
+					"aggregations": map[string]interface{}{"type": "array", "description": "Aggregations"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleVulnerabilityAffectedEntitiesSegment)
+		}, h.handleVulnerabilityAffectedEntitiesSegment)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_vulnerability_affected_entities_muting",
-		Description: `Mute/unmute affected entities for a vulnerability.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":       map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
-				"entities": map[string]interface{}{"type": "array", "description": "Entity IDs to mute/unmute"},
-				"muted":    map[string]interface{}{"type": "boolean", "description": "Mute (true) or unmute (false)"},
-				"reason":   map[string]interface{}{"type": "string", "description": "Reason for muting"},
+	if isEnabled("dt_vulnerability_affected_entities_muting") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_vulnerability_affected_entities_muting",
+			Description: `Mute/unmute affected entities for a vulnerability.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":       map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
+					"entities": map[string]interface{}{"type": "array", "description": "Entity IDs to mute/unmute"},
+					"muted":    map[string]interface{}{"type": "boolean", "description": "Mute (true) or unmute (false)"},
+					"reason":   map[string]interface{}{"type": "string", "description": "Reason for muting"},
+				},
+				Required: []string{"id", "entities", "muted"},
 			},
-			Required: []string{"id", "entities", "muted"},
-		},
-	}, h.handleVulnerabilityAffectedEntitiesMuting)
+		}, h.handleVulnerabilityAffectedEntitiesMuting)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_vulnerability_affected_entities_set_tracking_links",
-		Description: `Set tracking links for affected entities.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":             map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
-				"entities":       map[string]interface{}{"type": "array", "description": "Entity IDs"},
-				"tracking_links": map[string]interface{}{"type": "array", "description": "Tracking links to set"},
+	if isEnabled("dt_vulnerability_affected_entities_set_tracking_links") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_vulnerability_affected_entities_set_tracking_links",
+			Description: `Set tracking links for affected entities.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":             map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
+					"entities":       map[string]interface{}{"type": "array", "description": "Entity IDs"},
+					"tracking_links": map[string]interface{}{"type": "array", "description": "Tracking links to set"},
+				},
+				Required: []string{"id", "entities", "tracking_links"},
 			},
-			Required: []string{"id", "entities", "tracking_links"},
-		},
-	}, h.handleVulnerabilitySetTrackingLinks)
+		}, h.handleVulnerabilitySetTrackingLinks)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_vulnerability_affected_entities_delete_tracking_links",
-		Description: `Delete tracking links from affected entities.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":             map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
-				"entities":       map[string]interface{}{"type": "array", "description": "Entity IDs"},
-				"tracking_links": map[string]interface{}{"type": "array", "description": "Tracking link IDs to delete"},
+	if isEnabled("dt_vulnerability_affected_entities_delete_tracking_links") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_vulnerability_affected_entities_delete_tracking_links",
+			Description: `Delete tracking links from affected entities.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":             map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
+					"entities":       map[string]interface{}{"type": "array", "description": "Entity IDs"},
+					"tracking_links": map[string]interface{}{"type": "array", "description": "Tracking link IDs to delete"},
+				},
+				Required: []string{"id", "entities", "tracking_links"},
 			},
-			Required: []string{"id", "entities", "tracking_links"},
-		},
-	}, h.handleVulnerabilityDeleteTrackingLinks)
+		}, h.handleVulnerabilityDeleteTrackingLinks)
+	}
 
 	// ==================== Davis Assessment ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_vulnerability_davis_assessment",
-		Description: `Get Davis AI security assessment for a vulnerability.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id": map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
+	if isEnabled("dt_vulnerability_davis_assessment") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_vulnerability_davis_assessment",
+			Description: `Get Davis AI security assessment for a vulnerability.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id": map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleVulnerabilityDavisAssessment)
+		}, h.handleVulnerabilityDavisAssessment)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_vulnerability_davis_assessment_segment",
-		Description: `Get Davis assessment with segmentation.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"id":           map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
-				"segment_by":   map[string]interface{}{"type": "array", "description": "Fields to segment by"},
-				"aggregations": map[string]interface{}{"type": "array", "description": "Aggregations"},
+	if isEnabled("dt_vulnerability_davis_assessment_segment") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_vulnerability_davis_assessment_segment",
+			Description: `Get Davis assessment with segmentation.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"id":           map[string]interface{}{"type": "string", "description": "Vulnerability ID"},
+					"segment_by":   map[string]interface{}{"type": "array", "description": "Fields to segment by"},
+					"aggregations": map[string]interface{}{"type": "array", "description": "Aggregations"},
+				},
+				Required: []string{"id"},
 			},
-			Required: []string{"id"},
-		},
-	}, h.handleVulnerabilityDavisAssessmentSegment)
+		}, h.handleVulnerabilityDavisAssessmentSegment)
+	}
 
 	// ==================== Davis Security Recommendations ====================
-	s.AddTool(mcp.Tool{
-		Name:        "dt_davis_security_recommendations_list",
-		Description: `List Davis AI security recommendations.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
-				"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+	if isEnabled("dt_davis_security_recommendations_list") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_davis_security_recommendations_list",
+			Description: `List Davis AI security recommendations.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"filter":    map[string]interface{}{"type": "string", "description": "Filter query"},
+					"page_size": map[string]interface{}{"type": "integer", "description": "Page size"},
+				},
 			},
-		},
-	}, h.handleDavisSecurityRecommendationsList)
+		}, h.handleDavisSecurityRecommendationsList)
+	}
 
-	s.AddTool(mcp.Tool{
-		Name:        "dt_davis_security_recommendations_segment",
-		Description: `Get security recommendations with segmentation.`,
-		InputSchema: mcp.ToolInputSchema{
-			Type: "object",
-			Properties: map[string]interface{}{
-				"filter":       map[string]interface{}{"type": "string", "description": "Filter query"},
-				"segment_by":   map[string]interface{}{"type": "array", "description": "Fields to segment by"},
-				"aggregations": map[string]interface{}{"type": "array", "description": "Aggregations"},
+	if isEnabled("dt_davis_security_recommendations_segment") {
+		s.AddTool(mcp.Tool{
+			Name:        "dt_davis_security_recommendations_segment",
+			Description: `Get security recommendations with segmentation.`,
+			InputSchema: mcp.ToolInputSchema{
+				Type: "object",
+				Properties: map[string]interface{}{
+					"filter":       map[string]interface{}{"type": "string", "description": "Filter query"},
+					"segment_by":   map[string]interface{}{"type": "array", "description": "Fields to segment by"},
+					"aggregations": map[string]interface{}{"type": "array", "description": "Aggregations"},
+				},
 			},
-		},
-	}, h.handleDavisSecurityRecommendationsSegment)
+		}, h.handleDavisSecurityRecommendationsSegment)
+	}
 }
 
 // ==================== Handler Implementations ====================
