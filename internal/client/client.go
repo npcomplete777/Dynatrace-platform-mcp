@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dynatrace/dynatrace-platform-mcp-server/internal/config"
+	"github.com/npcomplete777/Dynatrace-platform-mcp/internal/config"
 )
 
 // Client is an HTTP client for Dynatrace Platform APIs.

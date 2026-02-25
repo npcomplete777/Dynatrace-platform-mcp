@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/dynatrace/dynatrace-platform-mcp-server/internal/client"
+	"github.com/npcomplete777/Dynatrace-platform-mcp/internal/client"
 	"github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 )

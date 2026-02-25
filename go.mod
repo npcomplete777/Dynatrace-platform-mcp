@@ -1,4 +1,4 @@
-module github.com/dynatrace/dynatrace-platform-mcp-server
+module github.com/npcomplete777/Dynatrace-platform-mcp
 
 go 1.23
 

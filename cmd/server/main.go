@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dynatrace/dynatrace-platform-mcp-server/internal/client"
-	"github.com/dynatrace/dynatrace-platform-mcp-server/internal/config"
-	"github.com/dynatrace/dynatrace-platform-mcp-server/internal/server"
+	"github.com/npcomplete777/Dynatrace-platform-mcp/internal/client"
+	"github.com/npcomplete777/Dynatrace-platform-mcp/internal/config"
+	"github.com/npcomplete777/Dynatrace-platform-mcp/internal/server"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 )
 
